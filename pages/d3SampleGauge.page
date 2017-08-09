@@ -1,0 +1,12 @@
+<apex:page >
+
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/E9AADD94-5D0D-564C-922E-FB6261E71569/main.js" charset="UTF-8" ></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8" ></script>
+
+
+<apex:includeScript loadOnReady="True" value="{!URLFOR($Resource.TestGauge, '/d3GaugeSample/d3GaugeSample.js')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.TestGauge, '/d3GaugeSample/d3GuageSample.css')}"/>
+
+<div class='chart-gauge'></div>
+
+</apex:page>

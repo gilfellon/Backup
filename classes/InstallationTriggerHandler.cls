@@ -980,7 +980,7 @@ public class InstallationTriggerHandler {
         
     }
     /*
-             Method Name: sharewithOldOwner
+             Method Name: sharewithOldOwner(No longer required after License Change)
              Purpose: To enable Paul to view installations assigned by him in the community
              Input Parameter : List of Installation
              Created Date: May 2017
@@ -1029,6 +1029,12 @@ for(Installation_Form__c iform:newtrigger){
    
 }
 }*/
+    /*
+             Method Name: sendmailtoinstallerwithAttach
+             Purpose: To enable send mails to installer assigned along with attached CSV of positions
+             Input Parameter : List of Installation
+             Created Date: July 2017
+             */
 /*public static void sendmailtoinstallerwithAttach(Set<Id> newtrigger)
 {
 List<Position__c> poslist = [Select id,Name,Model__c,Panels__c,Configuration__c,Width_Inches__c,Height_Inches__c,Installation__c,Installation__r.Name,Installation__r.Installer_Contact__c,Installation__r.Order_Number_Email__c,Installation__r.Project__c,Installation__r.Project__r.Name,Installation__r.Street_Address__c,Installation__r.City__c,Installation__r.State__c,Installation__r.Zip_Postal_Code__c,Installation__r.Model_List__c,Installation__r.Number_of_Positions__c,Installation__r.ShippingName__c,Installation__r.ShippingCompany__c,Installation__r.ShippingPhone__c,Installation__r.Freight_ETAJobsite__c,Installation__r.Freight_TrackingNumber__c,Installation__r.Drawings_Links__c,Installation__r.Installer_Contact__r.Name from Position__c where Installation__c in: newtrigger]; 

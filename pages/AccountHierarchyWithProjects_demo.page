@@ -1,0 +1,361 @@
+<apex:page standardController="Account" extensions="HierarchyController_demo" sidebar="false" readOnly="true" >
+    <script>
+  
+function myFunction(id, k) {
+    //  alert('Nishant');
+  var input, filter, table, tr, td, i;
+  input = document.getElementById(id);
+    // alert(id);  
+  filter = input.value.toUpperCase();
+
+  table = document.getElementById("j_id0:frm:accsTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[k];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+    
+ function OnMouseOverTextDisplay()
+    {
+        //  var xy = $("tr").find("th:eq(0)");
+        // var table = document.getElementById ("tb1");
+        // alert (table.rows[1].cells[1].headers);
+        var x = document.getElementById("j_id0:frm:summaryAcc:j_id14:j_id15:j_id16header:sortDiv").headers;
+        alert(x); 
+    }
+ var newWin=null;
+ function LookupAccountPopup(name, id)
+ {
+  var url="/apex/LookupAccountPopup?id={!Account.Id}";
+  newWin=window.open(url, 'Popup','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+  if (window.focus)
+  {
+   newWin.focus();
+  }
+    
+     return false;
+    }
+       
+ 
+</script>
+    <style>
+                                                                .container
+                                                                {
+                                                                  overflow:auto; 
+                                                                  height:100px;   
+                                                                }
+                                                                .headerRow .headerStyle
+                                                                {
+                                                                                color: #CC0000 !important;
+                                                                                position:relative;
+                                                                                TOP: expression(this.offsetParent.scrollTop-2);        
+                                                                }
+  
+/* tables */
+.tablesorter {
+    font-family:arial;
+    background-color: #CDCDCD;
+    margin:10px 0pt 15px;
+    font-size: 8pt;
+    width: 100%;
+    text-align: left;
+}
+.tablesorter thead tr th, .tablesorter tfoot tr th {
+    background-color: #e6EEEE;
+    border: 1px solid #FFF;
+    font-size: 8pt;
+    padding: 4px;
+}
+.tablesorter thead tr .header {
+        background-image: url(<apex:image url="{!URLFOR($Resource.NanawallStyle,'bg.jpg')}"/>);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+.tablesorter tbody td {
+    color: #3D3D3D;
+    padding: 4px;
+    background-color: #FFF;
+    vertical-align: top;
+}
+.tablesorter tbody tr.odd td {
+    background-color:#F0F0F6;
+}
+.tablesorter thead tr .headerSortUp {
+    background-image: url(<apex:image url="{!URLFOR($Resource.NanawallStyle,'asc.gif')}"/>);
+}
+.tablesorter thead tr .headerSortDown {
+    background-image: url( <apex:image url="{!URLFOR($Resource.NanawallStyle,'desc.gif')}"/>);
+}
+.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+background-color: #8dbdd8;
+}
+
+      <!--  .odd { 
+background-color: #FCF7F7;
+}
+.even {
+background-color: #E3DCDB;
+}-->
+  
+                                                                </style>
+    <apex:includeScript value="{!$Resource.TableColSorter}"></apex:includeScript>
+     <apex:includeScript value="{!URLFOR($Resource.NanawallVFPage,'jquery-latest.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.NanawallVFPage,'jquery.tablesorter.min.js')}" />
+   <apex:includeScript value="{!URLFOR($Resource.NanawallStyle,'Nanastyle.css')}" />
+   <apex:image url="{!URLFOR($Resource.NanawallStyle,'asc.gif')}"/>
+    
+    <apex:form id="frm">
+        <apex:actionFunction name="refreshPageSize" action="{!refreshPageSize}" status="fetchStatus" reRender="pbId"/>
+        <!--
+    <input type="radio" name="rdchk" value="Yes" onclick="javascript:yesnoCheck();" id="chkyes"> Yes</input>
+    <input type="radio" name="rdchk" value="No" id="chkno" onlick="javascript:yesnoCheck();"> No</input>
+ -->
+<apex:PageBlock id="summaryAcc">
+     <apex:pageBlockSection columns="1">
+         <apex:pageBlockTable var="acc" value="{!Account}" id="tb1">
+            <apex:column > <apex:facet name="header">
+                <apex:outputPanel >
+                    <apex:outputText value="Corporate Account Name">
+                        <apex:image url="{!$Resource.Help}" width="10" height="10"  title="Corporate Account"/>
+                    </apex:outputText>
+                 </apex:outputPanel>
+             </apex:facet>
+       <!--  <apex:column headerValue="Corporate Account Name" onmouseover="OnMouseOverTextDisplay();"> -->
+         <apex:outputLink value="/{!acc.Id}">{!acc.Name}</apex:outputLink>
+         </apex:column>
+             
+                 <apex:column value="{!siz}" headerValue="Site Count"  />
+             <apex:column value="{!ProjSiteList.size}" headerValue="Projects Count"  />
+             <apex:column headerValue="Most Recent Order Date">
+             <apex:outputText value="{0,date,MM'/'dd'/'yyyy}"><apex:param value="{!ordFnzDtMax}"/></apex:outputText>
+             </apex:column>
+             <apex:column value="{!prjStgWon}" headerValue="Projects Won (Order Paid)"/> 
+             <apex:column value="{!prjStgPrg}" headerValue="Projects (Order In Progress)"/>
+             <apex:column value="{!prjStgQtd}" headerValue="Projects (Quote in Progress)"/>
+             <apex:column value="{!prjStglost}" headerValue="Project Lost"/>
+             <apex:column value="{!DuplPrj }" headerValue="Duplicate Projects"/>
+           <!--  <apex:column value="{!CAProjOppList.size}" headerValue="QuoteLess Opportunities"/> -->
+            <!-- <apex:column value="{!siz}" headerValue="Project Count"/> -->
+           <!--  <apex:column value="{!prjWon}" headerValue="Projects Won"/> -->
+             <apex:column headerValue="Closure Rate">
+                 <apex:outputText value="{0,Number,0.00}%"><apex:param value="{!(100*prjWon)/IF(ProjSiteList.size == 0, 1, ProjSiteList.size)}" /></apex:outputText> 
+            </apex:column>
+         <!--   <apex:column headerValue="Amount Quoted (Total)">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!totalAmount}" /></apex:outputText> 
+            </apex:column> -->
+            <apex:column headerValue="Amount (Projects Won)">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!prjStgWonAmt}" /></apex:outputText> 
+            </apex:column>
+            <apex:column headerValue="">
+                <apex:facet name="header">
+                <apex:outputPanel >
+                    <apex:outputText value="Amount (Order In Progress)" title="Total Amount where project Stage : Closed Won - Order In Process ,Closed Won - Order Signed,Order - Negotiation & Project On Hold ">
+                        <apex:image url="{!$Resource.Help}" width="10" height="10"  title="Total Amount where project Stage : Closed Won - Order In Process ,Closed Won - Order Signed,Order - Negotiation & Project On Hold "/>                    </apex:outputText>
+                 </apex:outputPanel>
+             </apex:facet>
+                 <apex:outputText value="{0, Number, Currency}" title="Total Amount where project Stage : Closed Won - Order In Process ,Closed Won - Order Signed,Order - Negotiation & Project On Hold "><apex:param value="{!prjStgPrgAmt}" /></apex:outputText> 
+            </apex:column>
+            <apex:column headerValue="Amount (Quote In Progress)">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!prjStgQtdAmt}" /></apex:outputText> 
+            </apex:column>
+            <apex:column headerValue="Amount (Lost)">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!prjStglostAmt}" /></apex:outputText> 
+            </apex:column>
+           <!-- <apex:column headerValue="Amount Won">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!amountWon}" /></apex:outputText> 
+            </apex:column> -->
+           <apex:column headerValue="Total Amount">
+                 <apex:outputText value="{0, Number, Currency}"><apex:param value="{!totalAmount}" /></apex:outputText> 
+            </apex:column>
+         </apex:pageBlockTable>
+     </apex:pageBlockSection>
+    </apex:PageBlock>
+  
+<apex:pageBlock >
+    <apex:pageBlockSection >
+       <apex:pageBlockTable value="{!AccRelatedList}"  var="pr1">
+        <apex:inputField value="{!pr1.name}" />
+        </apex:pageBlockTable>
+        
+
+   
+    </apex:pageBlockSection>
+</apex:pageBlock>
+
+
+  
+   <apex:pageBlock id="accFilter">
+    <!--   <apex:repeat value="Account.Projects__r" var="prj">
+       <apex:inputField value="{!prj.Name}" /> 
+       </apex:repeat> -->
+  
+   <apex:pageBlockSection title="{!ProjectList.size} records found." collapsible="false" rendered="{!if(AccFilter!=null || PrjFilter!=null || CityFilter!=null || StateFilter!=null || ZipFilter!=null ||archFilter!=null||purFilter!=null||ordFilter!=null||prjStsFilter!=null||appIndFilter!=null, true,false)}"/>
+          <apex:pageBlockSection collapsible="true" title="Filters" columns="1" >
+              <apex:inputField value="{!Account.AccountChild__c}"/>
+              <apex:inputField value="{!Account.ParentAccount_CL__c}"/>
+              <apex:inputField value="{!Account.ParentID}" />
+              <apex:inputField value="{!Account.ID}" />  
+              <apex:panelGrid columns="6" cellspacing="10">
+                  <apex:outputLabel value="Account Name:"/>
+                  <input type="text" name="txt_acc_val" id="txt_acc_val" onkeyup="myFunction(this.id,0)" />  
+                <!--  <apex:inputText value="{!accfilter}" name="txt_acc_val" /> -->
+                 
+                  
+                  <a href="#" onclick="LookupAccountPopup('{!$Component.targetName}', '{!$Component.targetId}'); return false">Lookup</a>
+              <apex:outputLabel value="Project Name:"/><!--<apex:inputText value="{!prjFilter}"/>--> <input type="text" name="txt_acc_val1" id="txt_acc_val1" onkeyup="myFunction(this.id,1)" />  
+               <apex:outputLabel value="Project/Account City:"/><apex:inputText value="{!cityFilter}"/>
+               <apex:outputLabel value="Project/Account State:"/><apex:inputText value="{!stateFilter}"/>
+               <apex:outputLabel value="Project/Account Zipcode:"/><apex:inputText value="{!zipFilter}"/>
+               <apex:outputLabel value="Project Application Industry:"/><apex:selectList value="{!appIndFilter}" size="1">
+                 <apex:selectOptions value="{!ApplicationDrp}"/>
+                  </apex:selectList>
+                 <!-- <apex:inputText value="{!appIndFilter}"/> -->
+               <apex:outputLabel value="Project Stage:"/><apex:selectList value="{!project_drp_Stage}" size="1">
+                 <apex:selectOptions value="{!StageDrp}"/>
+               </apex:selectList>
+               <!--<apex:outputLabel value="Project Status:"/><apex:inputText value="{!prjStsFilter}"/> -->
+               <apex:outputLabel value="Architect Account:"/><apex:inputText value="{!archFilter}"/>
+               <apex:outputLabel value="Installed at Account:"/><apex:inputText value="{!purFilter}"/>
+               <apex:outputLabel value="Ordering Account :"/><apex:inputText value="{!ordFilter}"/>
+              </apex:panelGrid>
+              
+            <apex:pageBlockSectionItem ><apex:commandButton action="{!filter}" value="Apply Filter" reRender="accsTable" styleClass="buttonStyle" style="background:LightBlue;width:100px;height:30px;"/> <apex:commandButton value="Reset" action="{!refresh}" styleClass="buttonStyle" style="background:LightBlue;width:100px;height:30px;" /></apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+      
+     
+     
+    </apex:pageBlock>
+      <!-- Quoteless Opportunities -->
+         <apex:pageBlock >
+             <apex:pageBlockSection title="Quoteless Opportunities : {!CAProjOppList.size}" columns="2">
+   <apex:pageblockTable value="{!CAProjOppList }" var="opp">
+   <apex:column headervalue="Project Name" value="{!opp.Project_Name__r.Name}"/>    
+   <apex:column headervalue="Opportunity Name" value="{!opp.name}"/>
+   <apex:column headervalue="Created Dated ">
+   <apex:outputText value="{0,date,MM/dd/yy}"> <apex:param value="{!opp.Project_Name__r.CreatedDate}" /> </apex:outputText>    
+       </apex:column>
+   <apex:column headervalue="Stage Name" value="{!opp.StageName}"/>
+       
+   <apex:column headervalue="Architect" value="{!opp.Project_Name__r.Architect_Account__c}"/>
+   </apex:pageblockTable>
+                 </apex:pageBlockSection>
+   </apex:pageBlock>
+        
+      
+        
+        <!--Start Section------- -->
+<apex:datatable value="{!ProjectList}" var="pr1" id="accsTable" styleclass="tablesorter" >  
+        <apex:column headerValue="Name" id="AccNameId">
+           
+      <apex:outputField value="{!pr1.accountName.Name}"  />
+    </apex:column>
+    <apex:column headerValue="Project Name">
+      <apex:outputField value="{!pr1.projectName.Name}" />
+    </apex:column>
+    <apex:column headerValue="Project Status" ><apex:outputText value="{!pr1.status}"/></apex:column>
+    <apex:column headerValue="Amount" >
+       
+        <apex:outputText value="{0, number, 0.0}">
+        <apex:Param value="{!pr1.amount}"></apex:Param>
+        </apex:outputText></apex:column>
+    <apex:column headerValue="Project Created Date" ><apex:outputText value="{0, date, MM/dd/yyyy}">
+        <apex:Param value="{!pr1.crtdt}"></apex:Param></apex:outputText></apex:column>
+    <apex:column headerValue="Order Finalized Date">
+    <apex:DataTable value="{!pr1.ordFnzDt}" var="p">
+                  <apex:column >      
+                     <apex:outputText value="{0,date,MM'/'dd'/'yyyy}"><apex:param value="{!p}"/></apex:outputText>
+                   </apex:column>  
+                 </apex:DataTable>
+                
+    </apex:column>
+    <apex:column headerValue="Order Created Date">
+    <apex:DataTable value="{!pr1.ordCrtDt}" var="p">
+                  <apex:column >      
+                     <apex:outputText value="{0,date,MM'/'dd'/'yyyy}"><apex:param value="{!p}"/></apex:outputText>
+                   </apex:column>  
+                 </apex:DataTable>
+                
+    </apex:column>
+    <apex:column headerValue="Application Industry" ><apex:outputText value="{!pr1.applicationIndustry}"/></apex:column>
+    <apex:column headerValue="Architect" >
+             
+                     <apex:outputText value="{!pr1.architect.Name}">{!pr1.architect.Name}</apex:outputText>
+      </apex:column>
+    <apex:column headerValue="Installed at Account" ><apex:outputText value="/{!pr1.purchaser.Name}">{!pr1.purchaser.Name}</apex:outputText></apex:column>
+    <apex:column headerValue="Ordering Account" ><apex:outputText value="{!pr1.orderingAccount.Name}">{!pr1.orderingAccount.Name}</apex:outputText></apex:column>
+    <apex:column headerValue="Contact Role Name" >
+            <apex:DataTable value="{!pr1.ocr}" var="o">
+                  <apex:column >      
+                     <apex:outputLink value="/{!o.ContactId}">{!o.Contact.Name}</apex:outputLink>
+                   </apex:column>  
+                 </apex:DataTable>
+                 </apex:column>
+      <apex:column headerValue="Project City" ><apex:outputText value="{!pr1.projectCity}"/></apex:column>
+      <apex:column headerValue="Project State" ><apex:outputText value="{!pr1.projectState}"/></apex:column>
+      <apex:column headerValue="Project Zipcode" ><apex:outputText value="{!pr1.projectZipcode}"/></apex:column>
+      </apex:datatable>
+     <apex:panelGrid columns="5">
+    <apex:commandLink action="{!setCon.first}">First</apex:commandLink>
+    <apex:commandLink action="{!setCon.previous}" rendered="{!setCon.hasPrevious}">Previous</apex:commandLink>
+         <apex:outputText >{!(setCon.pageNumber * PaginationSize)+1-PaginationSize}-{!IF((setCon.pageNumber * PaginationSize)>noOfRecords, noOfRecords,
+                     (setCon.pageNumber * PaginationSize))} of {!noOfRecords}
+                </apex:outputText> 
+         
+    <apex:commandLink action="{!setCon.next}" rendered="{!setCon.hasNext}">Next</apex:commandLink>
+    <apex:commandLink action="{!setCon.last}">Last</apex:commandLink>
+    </apex:panelGrid>
+      <!---------------End Section------------ -->
+  
+
+       <apex:PageBlock id="pbId" >  
+      <apex:pageBlockSection columns="1" title="Corporate Account Site Location (End Customer) with No Projects : {!noOfRecords}">
+         <apex:pageBlockTable var="ac" value="{!Opportunities}">
+          <!--   <apex:column headerValue="Corporate Account Site Location (End Customer)"> --> 
+             <apex:column >
+             <apex:outputLink value="/{!ac.Id}">{!ac.Name}</apex:outputLink>
+             </apex:column>
+            <apex:column headerValue="Project Name"/>
+             <apex:column headerValue="Project Status"/>
+             <apex:column headerValue="Amount"/>
+             <apex:column headerValue="Project Created Date"/>
+             <apex:column headerValue="Order Finalized Date"/>
+             <apex:column headerValue="Application Industry"/>
+             <apex:column headerValue="Architect"/>
+             <apex:column headerValue="Purchaser Account"/>
+             <apex:column headerValue="Ordering Account"/>
+             <apex:column headerValue="Project Name"/>
+             <apex:column headerValue="Project City"/>
+             <apex:column headerValue="Project ZipCode"/>
+         </apex:pageBlockTable>
+         <apex:panelGrid columns="5">
+       <!--  <apex:selectList value="{!PaginationSize}" multiselect="false" size="1" onchange="refreshPageSize();">
+                   <apex:selectOptions value="{!paginationSizeOptions}"/>-->
+                    <apex:commandButton status="fetchStatus" reRender="pbId" value="First" action="{!setCon.first}" disabled="{!!setCon.hasPrevious}" title="First Page"/> 
+  
+                <apex:commandButton status="fetchStatus" reRender="pbId" value="Previous" action="{!setCon.previous}" disabled="{!!setCon.hasPrevious}" title="Previous Page"/> 
+                <apex:outputText >{!(setCon.pageNumber * PaginationSize)+1-PaginationSize}-{!IF((setCon.pageNumber * PaginationSize)>noOfRecords, noOfRecords,
+                     (setCon.pageNumber * PaginationSize))} of {!noOfRecords}
+                </apex:outputText> 
+                <apex:commandButton status="fetchStatus" reRender="pbId" value="Next" action="{!setCon.next}" disabled="{!!setCon.hasNext}" title="Next Page"/> 
+  
+                <apex:commandButton status="fetchStatus" reRender="pbId" value="Last" action="{!setCon.last}" disabled="{!!setCon.hasNext}" title="Last Page"/> 
+              <!-- <apex:outputText >{!(setCon.pageNumber * PaginationSize)+1-PaginationSize}-{!IF((setCon.pageNumber * PaginationSize)>noOfRecords, noOfRecords,
+                     (setCon.pageNumber * PaginationSize))} of {!noOfRecords}
+                </apex:outputText>--> 
+                <!--</apex:selectList>-->
+         </apex:panelGrid>
+        </apex:pageBlockSection>
+            
+    </apex:PageBlock>
+            
+</apex:form>   
+</apex:page>

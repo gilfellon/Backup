@@ -1,9 +1,9 @@
-/*****************Class Declaration
-* Author : CloudAlyze Solutions LLC
-* Class: HierarchyController
-* Version : 1.5
-* Last Modified Date : 08/04/2017
-* Modification : Comment & Structure the code , New project stage & opportunity stage apply on the code
+/*****************Class Declaration*********\
+    @ Author : CloudAlyze Solutions LLC
+    @ Class: HierarchyController
+    @ Version : 1.5
+    @ Last Modified Date : 08/04/2017
+    @ Last Modification : Comment & Structure the code , New project stage & opportunity stage apply on the code
 ********************/
 public class HierarchyController{
 /*****************Constructor Variable declaration********************/

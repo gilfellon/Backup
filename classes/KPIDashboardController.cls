@@ -312,7 +312,6 @@ public class KPIDashboardController {
         string themeName = UserInfo.getUiTheme();
         String userAgent = System.currentPageReference().getHeaders().get('User-Agent');
         if (themeName == 'Theme4t') {
-        	if(userAgent!=null){
             if(userAgent.contains('iPad'))
             {
                 chartHeight = 260;
@@ -331,8 +330,7 @@ public class KPIDashboardController {
                 legendName = 'bottom';
                 mobileCheck = true;
             }
-        	}
-        	} else {
+        } else {
             chartHeight = 260;
             chartWeight = 530;
             fname = 'only Non-Architects';
@@ -680,8 +678,10 @@ public class KPIDashboardController {
 
                     quoteList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
 
-                    orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval AND Order_Number__c > 1 GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
-
+                   //orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval AND Order_Number__c > 1 GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
+                    
+                    orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Order where CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval  GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
+                    
                     projectList = [select count(id) pid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Project__c where (NOT Name LIKE '%Test%') AND(NOT Name LIKE '%TEST%') AND(NOT Name LIKE '%test%') AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
               
                     projectListWithArch = [select count(id) pid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Project__c where ID in: projIdSet AND(NOT Name LIKE '%Test%') AND(NOT Name LIKE '%TEST%') AND(NOT Name LIKE '%test%') AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
@@ -715,7 +715,9 @@ public class KPIDashboardController {
 
                     quoteList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND Project__r.Owner.name =: salesrepname AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
 
-                    orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND Project__r.Owner.name =: salesrepname AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval AND Order_Number__c > 1 GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
+                    //orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Quote__c where Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND Project__r.Owner.name =: salesrepname AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval AND Order_Number__c > 1 GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
+
+                    orderList = [select count(id) qid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Order where Opportunity.RecordType.Name!= 'Influencer Opportunity' AND Project__r.Owner.name =: salesrepname AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval  GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
 
                     projectList = [select count(id) pid, CALENDAR_YEAR(convertTimezone(CreatedDate)) year, CALENDAR_MONTH(convertTimezone(CreatedDate)) month from Project__c where ID in: newProjOnlyArchIdSet AND Owner.name =: salesrepname AND(NOT Name LIKE '%Test%') AND(NOT Name LIKE '%TEST%') AND(NOT Name LIKE '%test%') AND CALENDAR_YEAR(convertTimezone(CreatedDate)) >=: startyearval GROUP BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ORDER BY CALENDAR_YEAR(convertTimezone(CreatedDate)), CALENDAR_MONTH(convertTimezone(CreatedDate)) ASC];
               
@@ -1342,7 +1344,7 @@ public class KPIDashboardController {
                 list < Project__c > projectStageList = [select id, stage__c, Amount__c from Project__c where ID in: projQuoteIdSet AND owner.name =: salesrepname
                     AND CALENDAR_YEAR(convertTimezone(CreatedDate)) =: thisYear AND(NOT Name LIKE '%Test%') AND(NOT Name LIKE '%TEST%') AND(NOT Name LIKE '%test%')
                 ];
-                list < ProjectStagesFunnelChart__c > pfList = ProjectStagesFunnelChart__c.getall().values();
+                list < ProjectStagesFunnelChart2__c > pfList = ProjectStagesFunnelChart2__c.getall().values();
                 pfList.sort();
                 
                 for (integer k= (pfList.size()-1); k>=0; k--) {

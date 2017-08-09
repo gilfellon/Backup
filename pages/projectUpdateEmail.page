@@ -1,0 +1,30 @@
+<!--
+    * @Page Name: projectUpdateEmail
+    * @Description: Page is designed to display success message after reps clicks on button in the received mail 
+    *==========================================================================================================
+    *       Version   | Date        | Author             | Comments
+    *----------------------------------------------------------------------------------*-----------------
+    *       1.0       | 12/07/2017  | Aquib Javed        | 1. Created page 
+    *                 |             |                    |    
+    *==========================================================================================================
+    -->
+
+<apex:page id="Page" standardStylesheets="false" showHeader="false" sidebar="false" controller="projectUpdateEmail_Controller" action="{!InitPage}" cache="false">
+<head>           
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="description" content=""/>
+      <meta name="author" content=""/>
+     
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+      <apex:stylesheet value="{!URLFOR($Resource.BootstrapTemplate, '/bootstrap/css/bootstrap.min.css')}" />           
+      <apex:includeScript value="{!URLFOR($Resource.BootstrapTemplate, '/bootstrap/js/bootstrap.min.js')}"/>
+     
+    </head>
+    <apex:form >
+
+    <img class="irc_mi" src="http://www.cmdgroup.com/img/logos/KW%20Nanawall_Logo_Final_with_tagline.jpg" onload="google.aft&amp;&amp;google.aft(this)" alt="Related image" width="100%" height="auto"/>
+                <img class="irc_mi" src="https://nonprofitally.com/wp-content/uploads/dontate_thanks.png" alt="Related image" onload="google.aft&amp;&amp;google.aft(this)" width="100%" height="auto"/>
+                </apex:form>
+</apex:page>

@@ -1,0 +1,91 @@
+<apex:component controller="multiAttachment_newController" allowDML="true">
+ <apex:attribute name="objId" type="String" description="The id of the object to manage attachments for" required="true" assignTo="{!sobjId}"/>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS221, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+            
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+    .table111{
+    height: 66px;
+    border: 5px;
+    padding: 30px; 
+    padding-left: 20px;
+    background-color: #ffffff;
+    }
+    .picklist{
+    width: 70%;
+    }
+    .browse{
+    height: 75%;
+    padding: 3px;
+    padding-left: 80px;
+    }
+</style>
+    </head>
+   <body>
+        <div class="Nanawallcustomcss">
+            
+            <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap slds-form--compound" aria-labelledby="newattachment">
+                <apex:form >
+                
+               
+                    <div class="slds-panel__section">
+                        <div class="slds-docked-form-footer slds-shrink-none slds-button-group slds-float--left" role="group">
+                         <apex:commandButton value="Upload" action="{!SaveFiles}"  styleClass="slds-button slds-button--neutral" onclick="move()"/>
+                            <span style="display:inline-block; width: 20px; height: 35px"></span>
+                          <apex:commandButton value="Back" action="{!goBack}"  styleClass="slds-button slds-button--brand" />
+                        </div>
+                    </div>
+                    <apex:pageMessages id="MSG" />
+                    <div class="slds-col slds-float--left slds-m-right--small">
+                    <div class="slds-icon slds-icon_container slds-icon-standard-file slds-icon--medium">
+                        <img src="{!URLFOR($Resource.SLDS221,'/assets/icons/standard/account_60.png')}" alt="" />
+                    </div>
+                </div>
+                    <div class="slds-col ">
+                    <div class="slds-page-header__title slds-truncate">
+                        MULTI ATTACHMENT PAGE
+                    </div>
+                </div>
+                    
+                    <div class="slds-panel__section" >
+                    
+                        <legend class="slds-form-element__label slds-text-title--caps">SELECT FILES TO UPLOAD</legend>
+                        <div id="myProgress">
+                            <div id="myBar"></div>
+                             </div>
+                        <div class="form-element__group">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element">
+                                <apex:pageBlock >
+<div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+
+             <apex:pageBlockTable value="{!newFiles}" var="newf">       
+                        <apex:column styleClass="table111">
+                     <apex:inputFile value="{!newf.versionData}" filename="{!newf.title}" id="file" styleClass="browse"/>
+                        </apex:column>
+                 <apex:column styleClass="table111" width="440px">
+                         <p class="MsoNormal" style="line-height:9.75pt"><b><span style="font-size:9.5pt;font-family:&quot;Arial&quot;,sans-serif;color:#333333">File Type</span></b></p>
+                     <apex:inputField value=" {!newf.Type_of_File__c}" label="File Type" id="pick" styleclass="btn btn-default dropdown-toggle" style="width: 50%"/>
+                 </apex:column>
+
+   </apex:pageBlockTable>
+         
+</div>
+</apex:PageBlock>                                
+</div>
+                            </div>
+                        </div>
+                    </div>
+                </apex:form>
+            </div>
+        </div>
+
+    </body>   
+</apex:component>

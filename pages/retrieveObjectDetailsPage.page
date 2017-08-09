@@ -1,0 +1,149 @@
+<apex:page Controller="retrieveObjectDetails" showHeader="false" standardStylesheets="false"  docType="html-5.0"  >
+
+
+  <script src="/resource/jQueryForPopup/jQuery/jquery-1.8.2.min.js" type="text/javascript" />
+    <script src="/resource/jQueryForPopup/jQuery/ui/jquery-ui-1.9.1.custom.min.js" type="text/javascript" />
+    <script src="/resource/jQueryForPopup/jQuery/postmessage/jquery.ba-postmessage.js" type="text/javascript" />
+    <script src="/resource/jQueryForPopup/jQuery/bbq/jquery.ba-bbq.min.js" type="text/javascript"/>
+    <link rel="stylesheet" href="/resource/jQueryForPopup/jQuery/ui/css/ui-lightness/jquery-ui-1.9.1.custom.min.css"/>
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS100,'assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+
+<head>
+<meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <apex:stylesheet value="{!URLFOR($Resource.salesforce_lightning, 'assets/styles/salesforce-lightning-design-system-vf.min.css')}" />
+
+ <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+
+
+</head>
+  <div class="slds" style="font-size:13px" id="abc">
+<apex:form id="formid">
+
+<span style="font-style:slds-form-element__label;font-size:20px;">Pipeline Wizard</span><br/><br/>
+<B>Project Name:</B>&nbsp;&nbsp;&nbsp;
+<apex:inputtext id="searchTextBox1" value="{!searchText}"/> <br/><br/>
+<B>Quote Name:</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:inputtext id="searchTextBox2" value="{!searchText}"/> <br/><br/>
+<B>Order Name:</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:inputtext id="searchTextBox3" value="{!searchText}"/> <br/><br/>
+<apex:PageBlock id="test">
+<b style="color:red"><apex:pageMessages ></apex:pageMessages></b>
+
+<apex:commandButton action="{!dosearch}" value="Search" reRender="tab,test" status="actStatusId"  style="font-size:11px;margin-left:2%"  styleClass="slds-button slds-button slds-button--neutral" disabled="{!buttonsEnabled}"/>
+<apex:commandButton action="{!Clear}" value="Clear" style="margin-left:2%;font-size:11px;" styleClass="slds-button slds-button slds-button--neutral"/>
+ <br/><br/>
+<apex:actionStatus id="actStatusId" >
+<apex:facet name="start" >
+<img src="/img/loading.gif" />                    
+</apex:facet>
+</apex:actionStatus>
+
+   
+  <apex:pageBlockSection id="tab1" columns="1">
+  
+   <!-- <div class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--compact">-->
+     <apex:outputPanel id="tab"  >
+        
+  <Table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--compact">
+  <apex:repeat value="{!orderdetailslst}" var="od" >          
+   
+
+   <tr>
+   <td><apex:outputLabel value="Order Name"></apex:outputLabel></td>
+  <td>  <apex:outputLink value="{!$Site.BaseUrl}/{!od.Order.Id}" id="theLink">
+   <apex:outputText value="{!od.Order.Name}" /></apex:outputLink> </td>
+    
+    </tr>
+    <tr>
+ <td><apex:outputLabel value="Effective Date"  /></td>
+    <td><apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.EffectiveDate}" ></apex:param> </apex:outputText></td>
+     </tr> 
+     <tr>
+     <td><apex:outputLabel value="Order Confirmation Date"/></td>
+      <td> <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Order_Confirmation_Started__c}" ></apex:param> </apex:outputText></td>
+      </tr>
+      <tr>
+   <td><apex:outputLabel value="Complete signoff Date"/></td>
+   <td> <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Complete_Signoff_Date__c}" ></apex:param> </apex:outputText></td>
+      </tr>
+      
+      <tr>
+     <td>  <apex:outputLabel value="Deposit Date"   /></td>
+   <td> <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Deposit_Date__c}" ></apex:param> </apex:outputText></td>
+      
+      </tr>
+      
+       <tr>
+     <td>  <apex:outputLabel value="OrderFinalizedDate"  / ></td>
+   <td> <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Order_Finalized_Date__c}" ></apex:param> </apex:outputText></td>
+     </tr>
+       
+       <tr>
+      <td> <apex:outputLabel value="Payment Type" / ></td>
+  <td> <apex:outputText value="{!od.Order.Payment_Type__c}" /> </td>
+    </tr>
+     
+     <tr>
+    <td> <apex:outputLabel value="Initial Deposit Description"  /></td>
+   <td><apex:outputText value="{!od.Order.Initial_Deposit_Description__c}" /> </td>
+        </tr>
+   <tr> 
+   <td><apex:outputLabel value="Initial Deposit Description"  /></td>
+  <td> <apex:outputText value="{!od.Order.Balance_Received_Amount__c}" /> </td>
+   </tr>
+    
+     <tr> 
+  <td>  <apex:outputLabel value="Invoice Sent Date" /></td>
+   <td> <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Invoices_Sent_Date__c}" ></apex:param> </apex:outputText></td>
+      </tr>
+      
+      <tr>
+     <td>  <apex:outputLabel value="Actual delivery Date"/></td>
+       <td>  <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.IN_Actual_Delivery_Date_c__c}" ></apex:param> </apex:outputText></td>
+      </tr>
+      
+      <tr>
+      <td><apex:outputLabel value="Balanced Received Date"/ ></td>
+      <td>   <apex:outputText value="{0, date, MM'/'dd'/'yyyy}" >
+    <apex:param value="{!od.Order.Balance_Received_Date__c}" ></apex:param> </apex:outputText></td>
+      </tr>
+      <tr>
+   <td>  <apex:outputLabel value="Installations"/ > </td>
+  
+    <td><apex:repeat value="{!od.installation}" var="op">
+     <apex:outputLink value="{!$Site.BaseUrl}/{!op.Id}" id="theLink2">
+     <apex:outputText label="Installation" value="{!op.Name}" /></apex:outputLink><br/>
+     </apex:repeat></td>
+     
+      </tr>
+      <tr>
+     <td> <apex:outputLabel value="Cases" /> </td>
+     <td>   <apex:repeat value="{!od.cases}" var="cs">
+      <apex:outputLink value="{!$Site.BaseUrl}/{!cs.Id}" id="theLink3">
+       <apex:outputText label="Case" value="{!cs.caseNumber}" /></apex:outputLink><br/>
+         </apex:repeat></td>
+          </tr>
+ </apex:repeat>
+</Table>
+</apex:outputpanel>
+ 
+ <!--</div>-->
+  </apex:pageBlockSection>
+ </apex:PageBlock>
+       
+</apex:form>
+</div>
+</html>  
+</apex:page>

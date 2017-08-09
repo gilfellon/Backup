@@ -1,0 +1,15 @@
+<apex:page controller="AccountDemo">
+    <apex:pageBlock >
+        <apex:pageBlockTable value="{!WrapperCombineAllData}" var="wr">
+          <apex:column headerValue="Project Name" value="{!wr.pr.name}"/>
+             
+             <apex:column headerValue="Contact Role" >
+                 <apex:repeat value="{!wr.opp1}" var="CR">
+                    {!CR.contact.Name}
+                 </apex:repeat>
+             </apex:column>
+             
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+  
+</apex:page>

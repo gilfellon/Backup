@@ -61,7 +61,6 @@ public with sharing class NanaQuote_Create_Order_Controller {
                 
         Order thiso = new Order();
         thiso.QuoteId = thisq.Id;
-        thiso.NanaQuote__c = this.thisQuote.Id;
         insert thiso;
         
         //we need to activate the order separately because the triggers wont allow you to activate the order during insert

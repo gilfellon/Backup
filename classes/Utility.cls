@@ -712,8 +712,8 @@ System.Debug('Returning abbr name map');
                 //is this redundant? the task trigger should catch this to set
                 //quote reviewed    
 //                q.Followup_Status__c = 'Reviewed';
-                q.Viewed__c=true;
-                update q;
+//                q.Viewed__c=true;
+ //               update q;
                 linenbr='before task load';
                 //if they open the quote or followup email clear the followup tasks
                 Map<id,Task> tl = new map<id,Task>([select id from Task where whatid=:QuoteID 
@@ -743,7 +743,7 @@ System.Debug('Returning abbr name map');
             {
                 t.Description = 'Quote CAD Email Opened';
                 t.Subject = 'Quote CAD Email Opened: ' + q.Quote_ID__c;         
-                q.CAD_Viewed__c=true;
+//                q.CAD_Viewed__c=true;
                 update(q); 
             }
             t.Status = 'Completed';
@@ -751,6 +751,15 @@ System.Debug('Returning abbr name map');
             t.WhatId = q.Id;
             t.OwnerId = '005A0000000M8piIAC';
             insert t;
+            
+            Quote__c updateq = null;
+            for( Quote__c q2 : [SELECT Id, Opened__c FROM Quote__c WHERE Id = :QuoteID] )
+            {
+            	updateq = q2;
+            	updateq.Opened__c = true;
+            	break;
+            }
+            if( updateq != null ) update updateq;
          
         }
         catch (Exception ex)

@@ -1,5 +1,5 @@
 trigger leadownerassignmentTrigger on Lead(before insert, before update) {
-    if(UtilityClass.doNotRunOnConverstionOfLead == true){
+    if(UtilityClass.doNotRunOnConverstionOfLead = true){
     list < Lead > updateLeadList = new list < Lead > ();
     list < Lead > lstLeads = new list < Lead > ();
     if (Trigger.isInsert) {

@@ -4,8 +4,30 @@ public class ServiceQuote_ReportController_Test {
     public static list < Attachment > attachments;
     public static list < case > cases;
     static testMethod void testMethod1() {
+      profile prof = [select id from Profile where name = 'Standard User'];
+         
+         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
+         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
+         insert user1;
         
-        Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
+        
+          list < OrderOppStages__c > ods = new list < OrderOppStages__c > ();
+        OrderOppStages__c odsv1 = new OrderOppStages__c();
+        odsv1.OppStage__c = 'Order - Requested';
+        odsv1.Name = 'Order Created';
+        ods.add(odsv1);
+        insert ods;
+            
+         
+        list < OrdProjectStages__c > ops = new list < OrdProjectStages__c > ();
+        
+        OrdProjectStages__c opsv1 = new OrdProjectStages__c();
+        opsv1.Name = 'Order Created';
+        opsv1.ProjStage__c = 'Order - Negotiation';
+        ops.add(opsv1);
+        insert ops;        
+        
+          Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
         mo.Name = 'Richmond';
         //mo.LatestNumber__c = 40200;
         mo.LatestOrderNumber__c='40209';
@@ -16,6 +38,12 @@ public class ServiceQuote_ReportController_Test {
         //mo1.LatestNumber__c = 20001;
         mo1.LatestOrderNumber__c='20017';
         insert mo1;
+        
+        Manufacturer_OrderNb__c mo7 = new Manufacturer_OrderNb__c();
+        mo7.Name = 'VQ';
+        //mo1.LatestNumber__c = 20001;
+        mo7.LatestOrderNumber__c='95001';
+        insert mo7;
         
         Manufacturer_OrderNb__c mo2 = new Manufacturer_OrderNb__c();
         mo2.Name = 'Teuffel';
@@ -31,15 +59,8 @@ public class ServiceQuote_ReportController_Test {
         
         ModelManufacturer__c mm=new ModelManufacturer__c();
         mm.Name='HSW 45';
-        mm.Manufacturer__c='Solarlux';
+        mm.Manufacturer__c='VQ';
         insert mm;
-        
-        
-      profile prof = [select id from Profile where name = 'Standard User'];
-         
-         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
-         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
-         insert user1;
         
         list<Zip_Codes_Master__c> lstzipCode = new list<Zip_Codes_Master__c>();
          Zip_Codes_Master__c zipCode1 = new Zip_Codes_Master__c();
@@ -193,7 +214,7 @@ public class ServiceQuote_ReportController_Test {
          qt.Balanced_Received_Date__c=date.today();
          qt.Balance_Received__c=20.66;
          qt.CAD_Opened__c=system.now();
-         qt.CAD_Sent__c=system.now();
+        // qt.CAD_Sent__c=system.now();
          qt.CAD_Viewed__c=false;
          qt.Canadian_Tax_Status__c='Company';
          qt.Cancelled__c=true;
@@ -379,16 +400,6 @@ public class ServiceQuote_ReportController_Test {
          insert qList;
         
          test.startTest();
-        
-         Quote q = new Quote();
-         q.Name = 'Test Quote';
-         q.OpportunityId = oppList[0].Id;
-         q.Nana_Quote__c = qList[0].Id;
-         q.First_Threshold_Price__c = 1;
-         q.ContactId = Con.id;
-         q.Tax = 1.0;
-         q.Order_Number__c = 12345;
-         insert q;
         
          order order1=new order();
          order1.AccountId=acc.id;
@@ -460,17 +471,39 @@ public class ServiceQuote_ReportController_Test {
         sqr.getSubTotal();
         sqr.getTax();
         sqr.getTotal();
-        //sqr.getUPSBillingAddress();
-        //sqr.getYellowBillingAddress();
+        sqr.getUPSBillingAddress();
+        sqr.getYellowBillingAddress();
         sqr.PurchaseOrder_SelectPositions();
-        //sqr.testPoVendor();
+        sqr.testPoVendor();
           
     
     }
     
     static testMethod void testMethod2() {
+      profile prof = [select id from Profile where name = 'Standard User'];
+         
+         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
+         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
+         insert user1;
+         
+         
+          list < OrderOppStages__c > ods = new list < OrderOppStages__c > ();
+        OrderOppStages__c odsv1 = new OrderOppStages__c();
+        odsv1.OppStage__c = 'Order - Requested';
+        odsv1.Name = 'Order Created';
+        ods.add(odsv1);
+        insert ods;
+            
+         
+        list < OrdProjectStages__c > ops = new list < OrdProjectStages__c > ();
         
-        Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
+        OrdProjectStages__c opsv1 = new OrdProjectStages__c();
+        opsv1.Name = 'Order Created';
+        opsv1.ProjStage__c = 'Order - Negotiation';
+        ops.add(opsv1);
+        insert ops;        
+        
+          Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
         mo.Name = 'Richmond';
         //mo.LatestNumber__c = 40200;
         mo.LatestOrderNumber__c='40209';
@@ -481,6 +514,12 @@ public class ServiceQuote_ReportController_Test {
         //mo1.LatestNumber__c = 20001;
         mo1.LatestOrderNumber__c='20017';
         insert mo1;
+        
+        Manufacturer_OrderNb__c mo7 = new Manufacturer_OrderNb__c();
+        mo7.Name = 'VQ';
+        //mo1.LatestNumber__c = 20001;
+        mo7.LatestOrderNumber__c='95001';
+        insert mo7;
         
         Manufacturer_OrderNb__c mo2 = new Manufacturer_OrderNb__c();
         mo2.Name = 'Teuffel';
@@ -496,15 +535,8 @@ public class ServiceQuote_ReportController_Test {
         
         ModelManufacturer__c mm=new ModelManufacturer__c();
         mm.Name='HSW 45';
-        mm.Manufacturer__c='Solarlux';
+        mm.Manufacturer__c='VQ';
         insert mm;
-        
-        
-      profile prof = [select id from Profile where name = 'Standard User'];
-         
-         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
-         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
-         insert user1;
         
         list<Zip_Codes_Master__c> lstzipCode = new list<Zip_Codes_Master__c>();
          Zip_Codes_Master__c zipCode1 = new Zip_Codes_Master__c();
@@ -658,7 +690,7 @@ public class ServiceQuote_ReportController_Test {
          qt.Balanced_Received_Date__c=date.today();
          qt.Balance_Received__c=20.66;
          qt.CAD_Opened__c=system.now();
-         qt.CAD_Sent__c=system.now();
+         //qt.CAD_Sent__c=system.now();
          qt.CAD_Viewed__c=false;
          qt.Canadian_Tax_Status__c='Company';
          qt.Cancelled__c=true;
@@ -845,18 +877,6 @@ public class ServiceQuote_ReportController_Test {
         
          test.startTest();
         
-        
-         Quote q = new Quote();
-         q.Name = 'Test Quote';
-         q.OpportunityId = oppList[0].Id;
-         q.Nana_Quote__c = qList[0].Id;
-         q.First_Threshold_Price__c = 1;
-         q.ContactId = Con.id;
-         q.Tax = 1.0;
-         q.Order_Number__c = 12345;
-         insert q;
-        
-         
          order order1=new order();
          order1.AccountId=acc.id;
          order1.BillingState = 'New York';
@@ -1019,8 +1039,31 @@ public class ServiceQuote_ReportController_Test {
     
     
     static testMethod void testMethod3() {
+      profile prof = [select id from Profile where name = 'Standard User'];
+         
+         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
+         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
+         insert user1;
+         
+         
+         
+          list < OrderOppStages__c > ods = new list < OrderOppStages__c > ();
+        OrderOppStages__c odsv1 = new OrderOppStages__c();
+        odsv1.OppStage__c = 'Order - Requested';
+        odsv1.Name = 'Order Created';
+        ods.add(odsv1);
+        insert ods;
+            
+         
+        list < OrdProjectStages__c > ops = new list < OrdProjectStages__c > ();
         
-        Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
+        OrdProjectStages__c opsv1 = new OrdProjectStages__c();
+        opsv1.Name = 'Order Created';
+        opsv1.ProjStage__c = 'Order - Negotiation';
+        ops.add(opsv1);
+        insert ops;        
+        
+          Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
         mo.Name = 'Richmond';
         //mo.LatestNumber__c = 40200;
         mo.LatestOrderNumber__c='40209';
@@ -1031,6 +1074,12 @@ public class ServiceQuote_ReportController_Test {
         //mo1.LatestNumber__c = 20001;
         mo1.LatestOrderNumber__c='20017';
         insert mo1;
+        
+        Manufacturer_OrderNb__c mo7 = new Manufacturer_OrderNb__c();
+        mo7.Name = 'VQ';
+        //mo1.LatestNumber__c = 20001;
+        mo7.LatestOrderNumber__c='95001';
+        insert mo7;
         
         Manufacturer_OrderNb__c mo2 = new Manufacturer_OrderNb__c();
         mo2.Name = 'Teuffel';
@@ -1046,16 +1095,8 @@ public class ServiceQuote_ReportController_Test {
         
         ModelManufacturer__c mm=new ModelManufacturer__c();
         mm.Name='HSW 45';
-        mm.Manufacturer__c='Solarlux';
+        mm.Manufacturer__c='VQ';
         insert mm;
-        
-        
-        
-      profile prof = [select id from Profile where name = 'Standard User'];
-         
-         User user1 = new User ( alias = 'testme', email = 'testme@noemail.com', emailencodingkey = 'UTF-8', lastname = 'test',languagelocalekey = 'en_US', 
-         localesidkey = 'en_US', profileid = prof.Id, country = 'United Kingdom', timezonesidkey = 'Europe/London', username = 'testme@noemail.com');
-         insert user1;
         
         list<Zip_Codes_Master__c> lstzipCode = new list<Zip_Codes_Master__c>();
          Zip_Codes_Master__c zipCode1 = new Zip_Codes_Master__c();
@@ -1227,7 +1268,7 @@ public class ServiceQuote_ReportController_Test {
          qt.Balanced_Received_Date__c=date.today();
          qt.Balance_Received__c=20.66;
          qt.CAD_Opened__c=system.now();
-         qt.CAD_Sent__c=system.now();
+        // qt.CAD_Sent__c=system.now();
          qt.CAD_Viewed__c=false;
          qt.Canadian_Tax_Status__c='Company';
          qt.Cancelled__c=true;
@@ -1352,17 +1393,22 @@ public class ServiceQuote_ReportController_Test {
          qList.add(qt);
          insert qList;
         
-         test.startTest();
+       /* list < Stock_Order_Detail__c > soList = new list < Stock_Order_Detail__c > ();
+        Stock_Order_Detail__c sl=new Stock_Order_Detail__c();
+        sl.Checked_In_Quantity__c =12;
+        sl.Position__c = 112;
+        sl.Quantity__c = 50;
+        sl.Service_Part__c = acc.Id;
+        sl.Stock_Order__c = acc.Id;
+        sl.Unit_Price__c = 100;
+        sl.discount__c = 11;
+        soList.add(sl);
+        insert soList;*/
         
-         Quote q = new Quote();
-         q.Name = 'Test Quote';
-         q.OpportunityId = oppList[0].Id;
-         q.Nana_Quote__c = qList[0].Id;
-         q.First_Threshold_Price__c = 1;
-         q.ContactId = Con.id;
-         q.Tax = 1.0;
-         q.Order_Number__c = 12345;
-         insert q;
+                
+            
+        
+         test.startTest();
         
          order order1=new order();
          order1.AccountId=acc.id;
@@ -1514,7 +1560,7 @@ public class ServiceQuote_ReportController_Test {
         sqr.getPaymentType();
         sqr.getPOBody_Display_Rendered();
         sqr.getPOBPositionSelector_Display_Rendered();
-        
+        ApexPages.currentPage().getHeaders().get('na7.salesforce.com');
         sqr.getPurchaseOrder_Reconciliation_Positions();
         sqr.getpurchaseOrder_RenderAs();
         sqr.getRichmondBillingAddress();
@@ -1522,14 +1568,16 @@ public class ServiceQuote_ReportController_Test {
         sqr.getSubTotal();
         sqr.getTax();
         sqr.getTotal();
-        //sqr.getUPSBillingAddress();
-        //sqr.getYellowBillingAddress();
+       // sqr.getUPSBillingAddress();
+       // sqr.getYellowBillingAddress();
         sqr.PurchaseOrder_SelectPositions();
         sqr.getPOVendor();
-        //sqr.testPoVendor();
+       // sqr.testPoVendor();
         
     
     }
-      
+    
+    
+    
 
 }

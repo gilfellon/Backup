@@ -69,7 +69,7 @@ global class  oppTeamSyncBatchClass implements Database.Batchable < sObject > {
                  ShareProject.add(ProShare);
           }
         }
-        for (Opportunity opp: oppAll){
+        /*for (Opportunity opp: oppAll){
             for (Id userId : projUserIdMap.get(opp.Project_Name__c)){
 
                 if(!oppUserIdMap.get(opp.Id).Contains(userId)){
@@ -79,15 +79,15 @@ global class  oppTeamSyncBatchClass implements Database.Batchable < sObject > {
                  oppTeamInsert.add(newOppTeam);
                 }
             } 
-        }
+        }*/
         
         if (oppTeamInsert.size() >0){
             Database.saveresult[] sr = Database.insert(oppTeamInsert, False);
             ErrorLogUtility.processErrorLogs(sr, oppTeamInsert, 'oppTeamSyncBatchClass', 'Execute', 'OpportunityTeamMember', 'Insert');
         }
         if (ShareProject.size() >0){
-           // Database.saveresult[] sr = Database.insert(ShareProject, False);
-            //ErrorLogUtility.processErrorLogs(sr, ShareProject, 'oppTeamSyncBatchClass', 'Execute', 'ProjectShare', 'Insert');
+            Database.saveresult[] sr = Database.insert(ShareProject, False);
+            ErrorLogUtility.processErrorLogs(sr, ShareProject, 'oppTeamSyncBatchClass', 'Execute', 'ProjectShare', 'Insert');
         }
         
      }

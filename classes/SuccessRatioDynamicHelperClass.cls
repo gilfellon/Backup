@@ -113,7 +113,7 @@ Created Date: 4th August,2016
         projectIdOnlyArchSet = new set<id>();
         //list<Opportunity> oppList = [select id, Budget_Quote__c, Project_Name__c, Quote_Count__c from Opportunity where Quote_Count__c>0 AND RecordType.Name!= 'Influencer Opportunity' AND CALENDAR_YEAR(convertTimezone(Project_Name__r.createdDate))>=2012];            
         
-        for(Opportunity opp: [select id, Budget_Quote__c, Project_Name__c, Quote_Count__c, RecordType.Name from Opportunity where Quote_Count__c>0 AND RecordType.Name='Influencer Opportunity' AND Project_Name__c IN: ProjectId AND Project_Name__r.Owner.Name=: SalesRepName AND CALENDAR_YEAR(convertTimezone(Project_Name__r.createdDate))>=2012])
+        for(Opportunity opp: [select id, Budget_Quote__c, Project_Name__c, Quote_Count__c, RecordType.Name from Opportunity where RecordType.Name='Influencer Opportunity' AND Project_Name__c IN: ProjectId AND Project_Name__r.Owner.Name=: SalesRepName AND CALENDAR_YEAR(convertTimezone(Project_Name__r.createdDate))>=2012])
         {
            
                projectIdArchSet.add(opp.Project_Name__c);
@@ -149,7 +149,13 @@ Created Date: 12th September,2016
         integer year = system.today().year();
         //list<Quote__c> QuoteList = [select id, Opportunity__r.Budget_Quote__c, Project__r.Name, Opportunity__r.Quote_Count__c, Order_Finalized_Date__c from Quote__c where Opportunity__r.Quote_Count__c>0 AND Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND CALENDAR_YEAR(convertTimezone(Project__r.createdDate))=:year];            
         
-        for(Quote__c quo: [select id, Opportunity__r.Budget_Quote__c, Project__r.Name, Opportunity__r.Quote_Count__c, Order_Finalized_Date__c from Quote__c where Opportunity__r.Quote_Count__c>0 AND Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND CALENDAR_YEAR(convertTimezone(Project__r.createdDate))=:year])
+       /* for(Quote__c quo: [select id, Opportunity__r.Budget_Quote__c, Project__r.Name, Opportunity__r.Quote_Count__c, Order_Finalized_Date__c from Quote__c where Opportunity__r.Quote_Count__c>0 AND Opportunity__r.RecordType.Name!= 'Influencer Opportunity' AND CALENDAR_YEAR(convertTimezone(Project__r.createdDate))=:year])
+        {
+            
+            projectIdFinalSet.add(quo.Project__c);
+        }*/
+        
+        for(Order quo: [select id, Opportunity.Budget_Quote__c, Project__r.Name, Opportunity.Quote_Count__c, Order_Finalized_Date__c from Order where Opportunity.RecordType.Name!= 'Influencer Opportunity' AND CALENDAR_YEAR(convertTimezone(Project__r.createdDate))=:year])
         {
             
             projectIdFinalSet.add(quo.Project__c);
@@ -157,9 +163,9 @@ Created Date: 12th September,2016
         
       //  list<Project__c> projectList = [select id, (select id, Order_Finalized_Date__c from Nana_Quotes__r where Order_Finalized_Date__c!=NULL) from project__c where id IN: projectIdFinalSet];
         
-        for(Project__c pro: [select id, (select id, Order_Finalized_Date__c from Nana_Quotes__r where Order_Finalized_Date__c!=NULL) from project__c where id IN: projectIdFinalSet])
+        for(Project__c pro: [select id, (select id, Order_Finalized_Date__c from Orders__r where Order_Finalized_Date__c!=NULL) from project__c where id IN: projectIdFinalSet])
         {
-            if(pro.Nana_Quotes__r.size()==0)
+            if(pro.Orders__r.size()==0)
             {
                  projectIdNewFinalSet.add(pro.id);
             }                   

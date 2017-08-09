@@ -196,7 +196,7 @@ public with sharing class TestDataUtility {
              p1.Name = 'Test Project CompetitorHelper_Test' + i;
              p1.Application__c = 'Automotive';
              p1.Application_2__c = 'Dealership';
-             p1.Project_Zip_Code__c = '94040' ;
+             p1.Project_Zip_Code__c = '12345' ;
              
              projlst.add(p1);
         }

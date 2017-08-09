@@ -2,7 +2,7 @@
 Description:- This class will be used to autofill the shopify address section on creation based on case in shopify
 *******************************************/
 public class CaseAddressToShopifyOnCreation {
-    //added by satish
+    //********added by satish***********
     //method to update bill to and ship to address on shopify and custom service quotes based on case  
     public static void SqAdrsFromCase(list < Service_Quote__c > sqlist) {
         set < id > sqCaseId = new set < id > ();

@@ -1,0 +1,159 @@
+<apex:page controller="CustomContactLookupController"  title="Search" showHeader="false" sideBar="false"  tabStyle="Contact" id="pg">
+
+    <script>
+            function openLookup(baseURL, width, modified, searchParam){
+            var originalbaseURL = baseURL;
+            var originalwidth = width;
+            var originalmodified = modified;
+            var originalsearchParam = searchParam;
+            var lookupType = baseURL.substr(baseURL.length-3, 3);
+         
+            baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.myForm}");
+            if (modified == '1') {
+            baseURL = baseURL + "&lksearch=" + searchParam;
+            }
+            if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+            openPopup(originalbaseURL, "MsgWindow", 350, 480, "width="+700+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+            } 
+</script>
+	    
+  <apex:form id="myForm">
+  <apex:outputPanel id="page" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+    <apex:tabPanel switchType="client" selectedTab="name1" id="tabbedPanel">
+
+      <!-- SEARCH TAB -->
+      <apex:tab label="Search" name="tab1" id="tabOne">
+
+        <apex:actionRegion >  
+          <apex:outputPanel id="top" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+            <apex:outputLabel value="Search" style="font-weight:Bold;padding-right:10px;" for="txtSearch"/>
+            <apex:inputText id="txtSearch" value="{!searchString}" />
+              <span style="padding-left:5px"><apex:commandButton id="btnGo" value="Go" action="{!Search}" rerender="searchResults"></apex:commandButton></span>
+          </apex:outputPanel>
+
+          <apex:outputPanel id="pnlSearchResults" style="margin:10px;height:350px;overflow-Y:auto;" layout="block">
+            <apex:pageBlock id="searchResults"> 
+              <apex:pageBlockTable value="{!results}" var="a" id="tblResults">
+                <TABLE>
+                <apex:column >
+
+                  <apex:facet name="header">
+                  
+                    <apex:outputPanel style="font-weight:bold;float:left">
+                      <tr>
+                      <td>
+                      <apex:outputLabel style="font-weight:bold;float:left" value="Name"/>
+                      </td>
+                      <td>
+                      <apex:outputLabel style="font-weight:bold;float:left" value="Email"/>
+                      </td>
+                      <td>
+                      <apex:outputLabel style="font-weight:bold;float:left" value="Account Name"/>
+                      </td>
+                     
+                      </tr>
+                    </apex:outputPanel>
+                     
+                  </apex:facet>
+                  
+                  <tr>
+                  <td>
+                   <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.Name}</apex:outputLink>   </td>
+                   <td>
+                    <apex:outputLabel >{!a.Email}</apex:outputLabel>
+                     </td>
+                     <td>
+                    <apex:outputLabel >{!a.Account.Name}</apex:outputLabel>
+                    </td>
+                    </tr>
+                    
+                </apex:column>
+                </TABLE>
+              </apex:pageBlockTable>
+            </apex:pageBlock>
+          </apex:outputPanel>
+        </apex:actionRegion>
+
+      </apex:tab>
+
+      <!-- NEW CONTACT TAB -->
+      <apex:tab label="New Contact" name="tab2" id="tabTwo">
+
+        <apex:pageBlock id="newContact" title="New Contact" >
+
+          <apex:pageBlockButtons >
+            <apex:commandButton action="{!saveContact}" value="Save"/>
+          </apex:pageBlockButtons>
+          <apex:pageMessages />
+
+          <apex:pageBlockSection columns="2">
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Salutation</apex:outputLabel>
+                <apex:inputField id="salut" value="{!contact.Salutation}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >First Name</apex:outputLabel>
+                <apex:inputField id="fname" value="{!contact.FirstName}"  required="true"/>
+            </apex:pageBlockSectionItem>
+
+             <apex:pageBlockSectionItem >
+                <apex:outputLabel >Last Name</apex:outputLabel>
+                <apex:inputField id="fname" value="{!contact.LastName}"  required="true"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Title</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.Title}"  />
+            </apex:pageBlockSectionItem>
+
+              <apex:pageBlockSectionItem >
+                <apex:outputLabel >Account Name</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.AccountID}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >CERO</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.CERO__c}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Email</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.Email}"  />
+            </apex:pageBlockSectionItem>
+
+             <apex:pageBlockSectionItem >
+                <apex:outputLabel >Street Address</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.MailingStreet}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >City</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.MailingCity}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >State</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.MailingStateCode}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Country</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.MailingCountryCode}"  />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Zip / Postal Code</apex:outputLabel>
+                <apex:inputField id="title" value="{!contact.MailingPostalCode}"  required="true"/>
+            </apex:pageBlockSectionItem>
+
+
+
+          </apex:pageBlockSection> 
+        </apex:pageBlock>
+
+      </apex:tab>
+    </apex:tabPanel>
+  </apex:outputPanel>
+  </apex:form>
+</apex:page>

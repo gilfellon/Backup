@@ -24,24 +24,28 @@
 
 
 
+
+
+
 <script type="text/javascript">
 // initialize the force.com client access variables ; set these up IN the visualforce page 
 var PartnerURL = "{!$Api.Partner_Server_URL_260}";//Using API 26.0 ; https://nanawall.mobile.cs10.force.com/mobile/services/Soap/u/24.0/00DJ00000007ZEO
 var APINumber = "v24.0";
 var SFSessionID = '{!$Api.Session_ID}';
 
-_totalOrderReportVars.AjaxURL 		= '{!$Page.AjaxResponder}';
-_totalOrderReportVars.ProfileID 	= '{!$User.ProfileId}'; 
-_totalOrderReportVars.UserID 		= '{!$User.Id}';
-_totalOrderReportVars.SessionID 	= '{!$Api.Session_ID}';
-_totalOrderReportVars.PartnerURL 	= '{!$Api.Partner_Server_URL_260}';
-_totalOrderReportVars.Debug			= true;
+_totalOrderReportVars.AjaxURL       = '{!$Page.AjaxResponder}';
+_totalOrderReportVars.ProfileID     = '{!$User.ProfileId}'; 
+_totalOrderReportVars.UserID        = '{!$User.Id}';
+_totalOrderReportVars.SessionID     = '{!$Api.Session_ID}';
+_totalOrderReportVars.PartnerURL    = '{!$Api.Partner_Server_URL_260}';
+_totalOrderReportVars.Debug         = true;
 
 
 </script>
 
 
 <div id='TotalOrder_Container'></div>
+
 
 
 </apex:page>

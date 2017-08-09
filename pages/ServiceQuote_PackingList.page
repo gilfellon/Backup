@@ -44,7 +44,7 @@
                            <!-- </tr>
                             <tr> -->                    
                                 <td style='font-size: 10px'>
-{!Service_Quote__c.Order_Number__c} / SL #: {!Service_Quote__c.SL_Order_Id__c}</td>
+{!Service_Quote__c.Order_Number_MF__c} / SL #: {!Service_Quote__c.SL_Order_Id__c}</td>
                                 
                             </tr>
                             <tr>

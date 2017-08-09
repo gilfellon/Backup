@@ -46,7 +46,7 @@
                                 </tr>
                                 <tr>
                                     <td class='labelCell' style='font-size: 10px'>Reference Order #:</td>
-                                    <td style='font-size: 10px'>{!Service_Quote__c.Order_Number__c} / SL #: {!Service_Quote__c.SL_Order_Id__c}</td>
+                                    <td style='font-size: 10px'>{!Service_Quote__c.Order_Number_MF__c} / SL #: {!Service_Quote__c.SL_Order_Id__c}</td>
                                 </tr>
                                 <tr>
                                     <td class='labelCell' style='font-size: 10px'>Project:</td>

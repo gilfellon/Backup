@@ -331,7 +331,7 @@ static testMethod void Accountruntest()
         }
         catch(Exception e){}
         accoun[1].Name = 'Test Account1';
-        accoun[1].Phone = '(123) 456-7819';
+        accoun[1].Phone = '(123) 456-78190';
         accoun[1].Name = 'Test account1';
         accoun[1].BillingCountryCode = 'CA';
         accoun[1].BillingPostalCode = 'V0M 9S9';
@@ -340,7 +340,7 @@ static testMethod void Accountruntest()
         insert accoun[1];
 
         accoun[2].Name = 'Test AccountIN';
-        accoun[2].Phone = '(123) 456-7819';
+        accoun[2].Phone = '(123) 456-78190';
         accoun[2].Name = 'Test accountIN';
         accoun[2].BillingCountryCode = 'IN';
         accoun[2].BillingPostalCode = '12345';
@@ -352,7 +352,7 @@ static testMethod void Accountruntest()
         }catch(Exception e){}
         
         accoun[3].Name = 'Test AccountMX';
-        accoun[3].Phone = '(123) 456-7819';
+        accoun[3].Phone = '(123) 456-78191';
         //accoun[3].Name = 'Test accountMX';
         accoun[3].BillingCountryCode = 'MX';
         //accoun[3].BillingCountry='Mexico';
@@ -782,9 +782,9 @@ static testMethod void Opportunityruntest() {
         
         User testUser1 = TestDataUtility.createUser('System Administrator','satish@lokin.com');
         insert testUser1;
-        /*List<Opportunity> lstOpps =  TestDataUtility.createOppTestData();
+        List<Opportunity> lstOpps =  TestDataUtility.createOppTestData();
         lstOpps[0].Amount = 500;
-        insert lstOpps;*/
+        insert lstOpps;
         User testUser2 = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUser2;
         Account a = getNewAccount();
@@ -826,7 +826,7 @@ static testMethod void Opportunityruntest() {
     insert p;
     }
     catch(Exception e){}
-        Test.startTest();
+
         list<Opportunity> listOpps = new List<Opportunity>();
         Opportunity o = getNewOpportunity();
             o.AccountId = a1.Id ;
@@ -835,12 +835,11 @@ static testMethod void Opportunityruntest() {
             o.StageName= 'Need Analysis';
             insert o;
             listOpps.add(o);
-        Test.stopTest();
             olstTestQuoteData =TestDatautility.createQuoteRecords(listOpps);
             insert olstTestQuoteData;
             o.Name = 'Edited Opportunity';
             o.AccountId= a.Id;
-            //o.OwnerId = testUser2.id;
+            o.OwnerId = testUser2.id;
             //o.StageName='Quote-Requested';
     try{        
     update o;
@@ -851,7 +850,7 @@ static testMethod void Opportunityruntest() {
             //update o;
            // o.AccountId= a.Id;
             //update o;
-            
+                    Test.startTest();
         nrOpportunityContactRole__c controle = getNewOpportunityContactRole();
         controle.Contact__c = c.Id;
         controle.Opportunity__c = o.Id;
@@ -916,14 +915,14 @@ static testMethod void Opportunityruntest() {
         oppacc.Opportunity__c = o.Id;
         oppacc.Account__c = a.Id;
     try{    
-   //insert oppacc;
-       // update oppacc;
+    insert oppacc;
+        update oppacc;
     }
     catch(Exception e){}
 
         try
         {
-           // delete oppacc;
+            delete oppacc;
         } catch( Exception ex )
         {
             //a workflow is causing an "ENTITY_IS_DELETED" here. wtf? who knows.
@@ -943,7 +942,7 @@ static testMethod void Opportunityruntest() {
             //a workflow is causing an "ENTITY_IS_DELETED" here. wtf? who knows.
         }             
 
-        
+        Test.stopTest();
     }   
 static testMethod void runtest5(){
     
@@ -1153,5 +1152,26 @@ static testMethod void runtest5(){
         ProjectHelper.updateCorpAccFrmProj(s1);
         ProjectHelper.updateResidentialVerticalFrmProj(s1);
         ProjectHelper.createProjSplitSpecifier(projlst);
-    }  
+    }
+    
+      static testmethod void method1(){
+        
+        list<Zip_Codes_Master__c> tmList = TestDataUtility.getTerritoryMaster();
+        insert tmList;
+    
+        lead l =new lead();
+        l.Type__c='test';
+        l.PostalCode='12345';
+        l.CountryCode='US';
+        l.FirstName='fe';
+        l.LastName='we';
+        l.Country='United States';
+                 
+        string countrycode =   'US';
+        string postalcode =  '12345';
+
+        Utility.getUserForTerritory( countrycode, postalcode );
+    
+    }
+
 }
