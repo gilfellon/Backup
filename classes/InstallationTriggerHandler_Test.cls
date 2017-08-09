@@ -255,9 +255,9 @@ public class InstallationTriggerHandler_Test {
         olstOpportunity = TestDataUtility.createOppTestData();
             olstOpportunity[0].Accountid=accounts[0].id;
             olstOpportunity[0].Project_Name__c =Pro[0].Id ;
-           // olstOpportunity[0].OwnerId=testuser1.id;
-          //  insert olstOpportunity;
-//        system.assert(olstOpportunity.size()>0);
+         //   olstOpportunity[0].OwnerId=testuser1.id;
+            insert olstOpportunity;
+        system.assert(olstOpportunity.size()>0);
            
         //Creating test data for Quote
         list<quote__c> Quo = new list<Quote__c>() ; 
@@ -267,21 +267,21 @@ public class InstallationTriggerHandler_Test {
             Quo[0].State__c = 'Test State';
             Quo[0].Address__c = 'Test Address' ; 
             Quo[0].Zip__c ='12345';
-          //insert quo[0] ; 
+          insert quo[0] ; 
         
              Quote q1 = new Quote();
              q1.Name = 'Test Quote';
-            // q1.OpportunityId = olstOpportunity[0].Id;
-            // q1.Nana_Quote__c = Quo[0].Id;
+             q1.OpportunityId = olstOpportunity[0].Id;
+             q1.Nana_Quote__c = Quo[0].Id;
              q1.First_Threshold_Price__c = 1;        
              q1.ContactId = con[0].id;
              q1.Tax = 1.0;
              q1.Order_Number__c = 12345;
-           //  insert q1;
+             insert q1;
         
           list<Quote_Detail__c> QuoteDetailList = TestDataUtility.createQuoteDetailData();
-        //  QuoteDetailList[0].Quote__C=quo[0].id;
-           // insert QuoteDetailList[0] ; 
+         QuoteDetailList[0].Quote__C=quo[0].id;
+            insert QuoteDetailList[0] ; 
     
         
         //Creating test data for countrys
@@ -315,18 +315,18 @@ public class InstallationTriggerHandler_Test {
         
         Quote q = new Quote();
          q.Name = 'Test Quote';
-        //q.AccountId = accounts[0].id;
-       // q.OpportunityId = olstOpportunity[0].id;
+       // q.AccountId = accounts[0].id;
+        q.OpportunityId = olstOpportunity[0].id;
         q.ContactId = con[0].id;
-       //insert q;
+       insert q;
             //Create test data for Orders
        Order o = new Order(
             AccountId = accounts[0].id,
             EffectiveDate = system.today(),
-           // OpportunityId = olstOpportunity[0].id,
+            OpportunityId = olstOpportunity[0].id,
             Pricebook2Id = Test.getStandardPricebookId(),
-            status='Draft'
-          // QuoteId = q.id;
+            status='Draft',
+           QuoteId = q.id
            // Balance_Received_Date__c = system.today()       
         );
         insert o;
@@ -344,15 +344,15 @@ public class InstallationTriggerHandler_Test {
        otm.PricebookEntryId = pbe.id;
        otm.Quantity = 1;
        otm.UnitPrice = 5532;
-     //  insert otm;
+       //insert otm;
         
         //Creating test data for entitlements
         Entitlement ent = new Entitlement();
         ent.Name = '0001sl';
         ent.AccountId = accounts[0].id;
         ent.StartDate = system.today();
-  //      ent.Order__c = o.id;
-     //   ent.Order_Product__c = otm.id;
+        ent.Order__c = o.id;
+       // ent.Order_Product__c = otm.id;
         insert ent;
         
        //Creating test data for Installation 
@@ -362,7 +362,7 @@ public class InstallationTriggerHandler_Test {
         inst.Installation_Address__c = 'Other Address';
        inst.Account__c = accounts[0].id ; 
        inst.Order__c = o.id;
-      // inst.Quote_Name__c = quo[0].ID ;
+       inst.Quote_Name__c = quo[0].ID ;
        inst.contact__c = con[0].id ; 
        inst.Installer_Account__c = accounts[0].id;
        inst.Installer_Contact__c = con[0].Id ;
@@ -480,7 +480,7 @@ public class InstallationTriggerHandler_Test {
             olstOpportunity[0].Accountid=accounts[0].id;
             olstOpportunity[0].Project_Name__c =Pro[0].Id ;
             olstOpportunity[0].OwnerId=testuser.id;
-          //  insert olstOpportunity;
+            insert olstOpportunity;
         system.assert(olstOpportunity.size()>0);
            
         //Creating test data for countrys
@@ -513,7 +513,7 @@ public class InstallationTriggerHandler_Test {
        insert pb2;
        
        //Create test data for Orders
-       /*Order o = new Order(
+       Order o = new Order(
             AccountId = accounts[0].id,
             EffectiveDate = system.today(),
             OpportunityId = olstOpportunity[0].id,
@@ -521,7 +521,7 @@ public class InstallationTriggerHandler_Test {
             status='Draft',
             Balance_Received_Date__c = system.today()       
         );
-        insert o;*/
+        insert o;
        
        //Creating test data for PriceBookEntry
        PricebookEntry pbe = new PricebookEntry();
@@ -532,7 +532,7 @@ public class InstallationTriggerHandler_Test {
            
         //Creating test data for OrderItem
        OrderItem otm = new orderitem();
-       //otm.OrderId = o.id;
+       otm.OrderId = o.id;
        otm.PricebookEntryId = pbe.id;
        otm.Quantity = 1;
        otm.UnitPrice = 5532;
@@ -543,35 +543,36 @@ public class InstallationTriggerHandler_Test {
         ent.Name = '0001sl';
         ent.AccountId = accounts[0].id;
         ent.StartDate = system.today();
-       // ent.Order__c = o.id;
-       // ent.Order_Product__c = otm.id;
+        ent.Order__c = o.id;
+      //  ent.Order_Product__c = otm.id;
         insert ent;
         
        //Creating test data for Installation 
        List<Installation__c> instalList = new List<Installation__c>();
        Installation__c inst = new Installation__c();
        inst.Status__c = 'Open';
-       //inst.Order__c = o.id;
+       inst.Order__c = o.id;
        inst.Installer_Account__c = accounts[0].id;
        instalList.add(inst);
        insert instalList;       
-      // instalList[0].Installation_Date__c =system.today();
+       instalList[0].Installation_Date__c =system.today();
        update instalList[0];   
        
         //Updating the order item
        otm.Installation__c = instalList[0].id;
-    //   update otm;        
+      // update otm;        
    }
    /*****
      Method:myUnitTest3
      ******/
     
-    /*public static testMethod void myUnitTest4(){
+    public static testMethod void myUnitTest4(){
        
         insert new Zip_Code_Range_for_Paul_Nalette__c(Name = 'Zip Range',Start_Value__c = 40000,End_Value__c = 48000);
         insert new Zip_Code_Range_for_Bill_Leon__c(Name = 'Northern NJ',Zip_Code_del__c = 7000,Zip_Code_End_Value__c = 8999);
         insert new Zip_Code_Range_for_Bill_Leon__c(Name = 'NY State',Zip_Code_del__c = 500,Zip_Code_End_Value__c = 15000);
-       Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
+        insert new Zip_Code_Range_for_Mark_Briggs__c(Name = 'Zip Range',Start_value__c = 19700,End_Value__c = 26899);
+        Manufacturer_OrderNb__c mo = new Manufacturer_OrderNb__c();
         mo.Name = 'Richmond';
         //mo.LatestNumber__c = 40200;
         mo.LatestOrderNumber__c='40209';
@@ -695,7 +696,7 @@ public class InstallationTriggerHandler_Test {
        insert inst ; 
               Test.stopTest() ;  
         
-    }  */
+    }  
     
     public static testMethod void myUnitTest5(){
     
@@ -812,9 +813,9 @@ public class InstallationTriggerHandler_Test {
         olstOpportunity = TestDataUtility.createOppTestData();
             olstOpportunity[0].Accountid=accounts[0].id;
             olstOpportunity[0].Project_Name__c =Pro[0].Id ;
-           // olstOpportunity[0].OwnerId=testuser1.id;
-           // insert olstOpportunity;
-      //  system.assert(olstOpportunity.size()>0);
+            //olstOpportunity[0].OwnerId=testuser1.id;
+            insert olstOpportunity;
+        system.assert(olstOpportunity.size()>0);
            
         //Creating test data for Quote
         list<quote__c> Quo = new list<Quote__c>() ; 
@@ -824,7 +825,7 @@ public class InstallationTriggerHandler_Test {
             Quo[0].State__c = 'Test State';
             Quo[0].Address__c = 'Test Address' ; 
             Quo[0].Zip__c ='12345';
-           // insert quo[0] ; 
+            insert quo[0] ; 
             
             Quote q1 = new Quote();
              q1.Name = 'Test Quote';
@@ -834,11 +835,11 @@ public class InstallationTriggerHandler_Test {
              q1.ContactId = Con[0].id;
              q1.Tax = 1.0;
              q1.Order_Number__c = 12345;
-            // insert q1;
+             insert q1;
         
           list<Quote_Detail__c> QuoteDetailList = TestDataUtility.createQuoteDetailData();
           QuoteDetailList[0].Quote__C=quo[0].id;
-            //insert QuoteDetailList[0] ; 
+            insert QuoteDetailList[0] ; 
     
         
         //Creating test data for countrys
@@ -873,7 +874,7 @@ public class InstallationTriggerHandler_Test {
         
        
        //Create test data for Orders
-      /* Order o = new Order(
+       Order o = new Order(
             AccountId = accounts[0].id,
             EffectiveDate = system.today(),
             OpportunityId = olstOpportunity[0].id,
@@ -881,7 +882,7 @@ public class InstallationTriggerHandler_Test {
             status='Draft',
             Balance_Received_Date__c = system.today()       
         );
-        insert o;*/
+        insert o;
        
        //Creating test data for PriceBookEntry
        PricebookEntry pbe = new PricebookEntry();
@@ -892,7 +893,7 @@ public class InstallationTriggerHandler_Test {
            
         //Creating test data for OrderItem
        OrderItem otm = new orderitem();
-      // otm.OrderId = o.id;
+       otm.OrderId = o.id;
        otm.PricebookEntryId = pbe.id;
        otm.Quantity = 1;
        otm.UnitPrice = 5532;
@@ -903,8 +904,8 @@ public class InstallationTriggerHandler_Test {
         ent.Name = '0001sl';
         ent.AccountId = accounts[0].id;
         ent.StartDate = system.today();
-  //      ent.Order__c = o.id;
-     //   ent.Order_Product__c = otm.id;
+        ent.Order__c = o.id;
+      //  ent.Order_Product__c = otm.id;
         insert ent;
         
        //Creating test data for Installation 
@@ -913,7 +914,7 @@ public class InstallationTriggerHandler_Test {
        inst.Status__c = 'Open';
         inst.Installation_Address__c = 'Other Address';
        inst.Account__c = accounts[0].id ; 
-       //inst.Order__c = o.id;
+       inst.Order__c = o.id;
        inst.Quote_Name__c = quo[0].ID ;
        inst.contact__c = con[0].id ; 
        inst.Installer_Account__c = accounts[0].id;
@@ -928,14 +929,14 @@ public class InstallationTriggerHandler_Test {
        instalList.add(inst);
        insert instalList;       
        instalList[0].Installation_Date__c =system.today();
-       //update instalList[0];   
+       update instalList[0];   
        
         //Updating the order item
-      // otm.Installation__c = instalList[0].id;
+       otm.Installation__c = instalList[0].id;
       // update otm;        
    }
     
-    public static testMethod void myUnitTest6(){
+    /*public static testMethod void myUnitTest6(){
     
         insert new Zip_Code_Range_for_Paul_Nalette__c(Name = 'Zip Range',Start_Value__c = 40000,End_Value__c = 48000);
         insert new Zip_Code_Range_for_Bill_Leon__c(Name = 'Northern NJ',Zip_Code_del__c = 7000,Zip_Code_End_Value__c = 8999);
@@ -989,9 +990,9 @@ public class InstallationTriggerHandler_Test {
        insert accounts;
        
        //Creating test data for contacts
-       /*contacts = testDataUtility.createConTestData();
+       contacts = testDataUtility.createConTestData();
        Contacts[0].Accountid=accounts[0].id;
-       insert contacts;*/
+       insert contacts;
        
        
        list<contact> con=new list<contact>();
@@ -1051,7 +1052,7 @@ public class InstallationTriggerHandler_Test {
             olstOpportunity[0].Accountid=accounts[0].id;
             olstOpportunity[0].Project_Name__c =Pro[0].Id ;
            // olstOpportunity[0].OwnerId=testuser1.id;
-          //  insert olstOpportunity;
+            insert olstOpportunity;
         system.assert(olstOpportunity.size()>0);
            
         //Creating test data for Quote
@@ -1062,21 +1063,21 @@ public class InstallationTriggerHandler_Test {
             Quo[0].State__c = 'Test State';
             Quo[0].Address__c = 'Test Address' ; 
             Quo[0].Zip__c ='12345';
-           // insert quo[0] ; 
+            insert quo[0] ; 
             
             Quote q1 = new Quote();
              q1.Name = 'Test Quote';
              q1.OpportunityId = olstOpportunity[0].Id;
-           //  q1.Nana_Quote__c = quo[0].Id;
+             q1.Nana_Quote__c = quo[0].Id;
              q1.First_Threshold_Price__c = 1;        
              q1.ContactId = Con[0].id;
              q1.Tax = 1.0;
              q1.Order_Number__c = 12345;
-            // insert q1;
+            insert q1;
         
           list<Quote_Detail__c> QuoteDetailList = TestDataUtility.createQuoteDetailData();
           QuoteDetailList[0].Quote__C=quo[0].id;
-           // insert QuoteDetailList[0] ; 
+            insert QuoteDetailList[0] ; 
     
         
         //Creating test data for countrys
@@ -1111,7 +1112,7 @@ public class InstallationTriggerHandler_Test {
         
        
        //Create test data for Orders
-      /* Order o = new Order(
+       Order o = new Order(
             AccountId = accounts[0].id,
             EffectiveDate = system.today(),
             OpportunityId = olstOpportunity[0].id,
@@ -1119,7 +1120,7 @@ public class InstallationTriggerHandler_Test {
             status='Draft',
             Balance_Received_Date__c = system.today()       
         );
-        insert o;*/
+        insert o;
        
        //Creating test data for PriceBookEntry
        PricebookEntry pbe = new PricebookEntry();
@@ -1130,19 +1131,19 @@ public class InstallationTriggerHandler_Test {
            
         //Creating test data for OrderItem
        OrderItem otm = new orderitem();
-       //otm.OrderId = o.id;
+       otm.OrderId = o.id;
        otm.PricebookEntryId = pbe.id;
        otm.Quantity = 1;
        otm.UnitPrice = 5532;
-     // insert otm;
+      insert otm;
         
         //Creating test data for entitlements
         Entitlement ent = new Entitlement();
         ent.Name = '0001sl';
         ent.AccountId = accounts[0].id;
         ent.StartDate = system.today();
-  //      ent.Order__c = o.id;
-     //   ent.Order_Product__c = otm.id;
+        ent.Order__c = o.id;
+       // ent.Order_Product__c = otm.id;
         insert ent;
         
        //Creating test data for Installation 
@@ -1151,8 +1152,8 @@ public class InstallationTriggerHandler_Test {
        inst.Status__c = 'Open';
         inst.Installation_Address__c = 'Other Address';
        inst.Account__c = accounts[0].id ; 
-       //inst.Order__c = o.id;
-       //inst.Quote_Name__c = quo[0].ID ;
+       inst.Order__c = o.id;
+       inst.Quote_Name__c = quo[0].ID ;
        inst.contact__c = con[0].id ; 
        inst.Installer_Account__c = accounts[0].id;
        inst.Installer_Contact__c = con[0].Id ;
@@ -1166,12 +1167,12 @@ public class InstallationTriggerHandler_Test {
        instalList.add(inst);
        insert instalList;       
        instalList[0].Installation_Date__c =system.today();
-       //update instalList[0];   
+       update instalList[0];   
        
         //Updating the order item
-      // otm.Installation__c = instalList[0].id;
-      // update otm;        
-   }
+       otm.Installation__c = instalList[0].id;
+       update otm;        
+   }*/
     public static testMethod void myUnitTest7(){
   
         insert new Zip_Code_Range_for_Paul_Nalette__c(Name = 'Zip Range',Start_Value__c = 40000,End_Value__c = 48000);
@@ -1193,10 +1194,10 @@ public class InstallationTriggerHandler_Test {
              prolist.Application_2__c = 'Dealership';
         insert prolist;
         list<Opportunity> opplist = TestDataUtility.createOppTestData();
-       // insert opplist;
+        insert opplist;
         test.startTest();
         list<Quote__C> quolist = TestDataUtility.createQuoteRecords(opplist);
-       // insert quolist;
+        insert quolist;
         User testUnew = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUnew;
         list<Installation__c> inst = TestDataUtility.createInsTestData();
@@ -1242,10 +1243,10 @@ public class InstallationTriggerHandler_Test {
              prolist.Application_2__c = 'Dealership';
         insert prolist;
         list<Opportunity> opplist = TestDataUtility.createOppTestData();
-       // insert opplist;
+        insert opplist;
                 test.startTest();
         list<Quote__C> quolist = TestDataUtility.createQuoteRecords(opplist);
-       // insert quolist;
+        insert quolist;
         User testUnew = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUnew;
         list<Installation__c> inst1 = TestDataUtility.createInsTestData();
@@ -1257,7 +1258,7 @@ public class InstallationTriggerHandler_Test {
         inst1[0].Installer_Account__c = acclist[0].id;
         inst1[0].contact__c = contest[0].id;
         inst1[0].Assigned_to__c = testUnew.id;
-       // inst1[0].Installation_Date__c = null;
+        inst1[0].Installation_Date__c = null;
         insert inst1;
         Entitlement ent = new Entitlement();
         ent.Name = '0001sl';
@@ -1292,15 +1293,15 @@ public class InstallationTriggerHandler_Test {
              prolist.Application_2__c = 'Dealership';
         insert prolist;
         list<Opportunity> opplist = TestDataUtility.createOppTestData();
-      //  insert opplist;
+        insert opplist;
                 test.startTest();
         list<Quote__C> quolist = TestDataUtility.createQuoteRecords(opplist);
-       // insert quolist;
+        insert quolist;
         list<Quote_Detail__c> qdlist = TestDataUtility.createQuoteDetailData();
         for(Integer i=0;i<qdlist.size();i++){
         qdlist[i].Quote__c = quolist[i].id;
         }
-       // insert qdlist;
+        insert qdlist;
         User testUnew = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUnew;
         list<Installation__c> inst1 = TestDataUtility.createInsTestData();
@@ -1312,8 +1313,8 @@ public class InstallationTriggerHandler_Test {
         inst1[0].Installer_Account__c = acclist[0].id;
         inst1[0].contact__c = contest[0].id;
         inst1[0].Assigned_to__c = testUnew.id;
-       // inst1[0].Project__c = prolist.id;
-       // inst1[0].Installation_Date__c = System.today();
+        inst1[0].Project__c = prolist.id;
+        inst1[0].Installation_Date__c = System.today();
         insert inst1;
         Entitlement ent = new Entitlement();
         ent.Name = '0001sl';
@@ -1326,7 +1327,7 @@ public class InstallationTriggerHandler_Test {
         
         test.stopTest();
     }
-   /* public static testMethod void myUnitTest10(){
+    public static testMethod void myUnitTest10(){
   
         list<Zip_Codes_Master__c> tmList = TestDataUtility.getTerritoryMaster();
             insert tmList;
@@ -1350,15 +1351,15 @@ public class InstallationTriggerHandler_Test {
              prolist.Application_2__c = 'Dealership';
         insert prolist;
         list<Opportunity> opplist = TestDataUtility.createOppTestData();
-        //insert opplist;
+        insert opplist;
                 test.startTest();
         list<Quote__C> quolist = TestDataUtility.createQuoteRecords(opplist);
-        //insert quolist;
+        insert quolist;
         list<Quote_Detail__c> qdlist = TestDataUtility.createQuoteDetailData();
         for(Integer i=0;i<qdlist.size();i++){
         qdlist[i].Quote__c = quolist[i].id;
         }
-        //insert qdlist;
+        insert qdlist;
         User testUnew = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUnew;
         list<Installation__c> inst1 = TestDataUtility.createInsTestData();
@@ -1369,9 +1370,9 @@ public class InstallationTriggerHandler_Test {
         }
         inst1[0].Installer_Account__c = acclist[0].id;
         inst1[0].contact__c = contest[0].id;
-        //inst1[0].Assigned_to__c = testUnew.id;
-        //inst1[0].Project__c = prolist.id;
-        //inst1[0].Installation_Date__c = null;
+        inst1[0].Assigned_to__c = testUnew.id;
+        inst1[0].Project__c = prolist.id;
+        inst1[0].Installation_Date__c = null;
         inst1[0].Assigned_To_Paul_Nalette__c = true;
         insert inst1;
         Entitlement ent = new Entitlement();
@@ -1384,7 +1385,7 @@ public class InstallationTriggerHandler_Test {
         update inst1[0];
         
         test.stopTest();
-    }*/
+    }
     public static testMethod void myUnitTest11(){
   
         list<Zip_Codes_Master__c> tmList = TestDataUtility.getTerritoryMaster();
@@ -1411,15 +1412,15 @@ public class InstallationTriggerHandler_Test {
              prolist.Application_2__c = 'Dealership';
         insert prolist;
         list<Opportunity> opplist = TestDataUtility.createOppTestData();
-        //insert opplist;
+        insert opplist;
                 test.startTest();
         list<Quote__C> quolist = TestDataUtility.createQuoteRecords(opplist);
-       // insert quolist;
+        insert quolist;
         list<Quote_Detail__c> qdlist = TestDataUtility.createQuoteDetailData();
         for(Integer i=0;i<qdlist.size();i++){
         qdlist[i].Quote__c = quolist[i].id;
         }
-        //insert qdlist;
+        insert qdlist;
         User testUnew = TestDataUtility.createUser('System Administrator','test@testingupdate.com');
         insert testUnew;
         list<Installation__c> inst1 = TestDataUtility.createInsTestData();
@@ -1432,7 +1433,7 @@ public class InstallationTriggerHandler_Test {
         inst1[0].contact__c = contest[0].id;
         inst1[0].Assigned_to__c = testUnew.id;
         inst1[0].Project__c = prolist.id;
-        //inst1[0].Installation_Date__c = null;
+        inst1[0].Installation_Date__c = null;
         inst1[0].Assigned_To_Bill_Leon__c = true;
         insert inst1;
         Entitlement ent = new Entitlement();

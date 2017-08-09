@@ -985,7 +985,7 @@ public class InstallationTriggerHandler {
              Input Parameter : List of Installation
              Created Date: May 2017
              */
-   public static void sharewithOldOwner(List < Installation__c > newTrigger){
+  /* public static void sharewithOldOwner(List < Installation__c > newTrigger){
         List<Installation__Share> ShareInstallation = new List<Installation__Share>();
         list<Installation__Share> oldshares = [Select id from Installation__Share where RowCause = :Schema.Installation__Share.rowCause.CommunityShare__c];
         for(Installation__c i:newtrigger){
@@ -1016,7 +1016,7 @@ public class InstallationTriggerHandler {
         catch(Exception e){
             System.debug('Exception is:'+e);
         }
-}
+}*/
 /*public static void signaturecaptureaction(List<Installation_Form__c> newtrigger)
 {
 List<QuickAction.DescribeAvailableQuickActionResult> result1 = QuickAction.DescribeAvailableQuickActions('Installation_Form__c');

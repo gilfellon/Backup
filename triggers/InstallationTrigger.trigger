@@ -164,7 +164,7 @@ trigger InstallationTrigger on Installation__c(before insert, after insert, afte
     }
     }
     if (insrecord.size() > 0) {
-          InstallationTriggerHandler.sharewithOldOwner(insrecord);
+          //InstallationTriggerHandler.sharewithOldOwner(insrecord);
             system.debug('DML 5.1' + Limits.getDMLStatements());
             system.debug('SOQL 5.1' + Limits.getQueries());
 
