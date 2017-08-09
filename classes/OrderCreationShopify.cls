@@ -1,0 +1,796 @@
+/**********************************************************************
+Apex Class: OrderCreationShopify
+Description: This REST Web service class is to fetch the data from shopify 
+             on Order Creation
+Created Date: 18th April,2016            
+***********************************************************************/
+@RestResource(urlMapping = '/OrderCreation/*')
+global without sharing class OrderCreationShopify {
+
+   //Global Variables
+   static string orderCreated = 'Order Created';
+   static string orderPending = 'pending';
+   static string orderPaid = 'Order Paid';
+   static string caseOrigin = 'Web';
+   static string caseStatus = 'New';
+   static string casePriority = 'Medium';
+   static string customer = 'End Customer';
+   static string financialPaid = 'Paid';
+   static string zip = '12345';
+   static string shipzip = '12345';
+  // static string caseRep ='Travis Troen';
+   
+   //This Method is used to Save Shopify Order in Salesforce
+    @HttpPost
+    global static void doPost() {
+    
+        // Local Variables       
+        list < wrapperObjectShopify > ordList = new list < wrapperObjectShopify > ();
+        string caseNo;
+        string Notes;
+        string orderEmail;
+        string servicePartName;
+        list < case >caseInsert = new list < case >();
+        list < service_quote__c > serviceQuoteDirectInsert = new list < service_quote__c > ();
+        list < Service_Quote_detail__c > sqDetailsDirectInsert = new list < Service_Quote_detail__c > ();
+        wrapperObjectShopify orderData;
+        list < string > caseid = new list < string > ();
+        string shopifyOrderCreationURL = label.Shopify_URL;
+       
+        
+        //Requesting REST Service to fetch the data send by shopify to this web service class
+        RestRequest req = RestContext.request;
+        RestResponse res = RestContext.response;
+        Blob body = req.requestBody;
+        String bodyString = body.toString();
+        /*res.addHeader('Content-Type', 'application/json');
+        res.statusCode = 200;*/
+        OrderCreationShopify.createDataObjects(bodyString);
+    }
+    
+    public static void createDataObjects(string bodyString){
+        
+        // Local Variables       
+        list < wrapperObjectShopify > ordList = new list < wrapperObjectShopify > ();
+        string caseNo;
+        string Notes;
+        string orderEmail;
+        string servicePartName;
+        list < case >caseInsert = new list < case >();
+        list < service_quote__c > serviceQuoteDirectInsert = new list < service_quote__c > ();
+        list < Service_Quote_detail__c > sqDetailsDirectInsert = new list < Service_Quote_detail__c > ();
+        wrapperObjectShopify orderData;
+        list < string > caseid = new list < string > ();
+        string shopifyOrderCreationURL = label.Shopify_URL;
+    //In bodyString the data that is received from shopify is stored and you can see the output in the below debug
+        System.debug('ordersssssssss' + bodyString);
+        
+         wrapperObjectShopify word = (wrapperObjectShopify) JSON.deserialize(bodyString, wrapperObjectShopify.class); 
+         system.debug('deserialize'+word);      
+               ordList.add(word);
+               if(word.note!=NULL){
+                caseNo = word.note;           
+                Notes = word.note;
+                }
+                orderData = word;             
+        // get all the parts in a map//modified by praveen
+        map<string,id> servicePartmap = new map<string,id>();
+        for(service_part__c sp : [select id,name,Part_Name__c from service_part__c where name!='' ]){
+            servicePartmap.put(sp.name,sp.id);  
+         }    
+        System.debug('#################' + caseNo);
+         case cs;
+          
+        if(caseNo!=NULL) {
+        String sub = caseNo.substringAfter('#');
+            System.debug('************' + sub);
+            caseNo = sub.left(8);         
+             try{
+             cs = [select id,ContactID,Other_Phone__c,Billing_Zipcode__c,Billing_Country__c,Billing_State__c,Billing_City__c,Billing_Street_End_Customer__c,Other_Shipping_Phone__c,Shipping_City_EndCustomer__c,Shipping_Street_End_Customer__c,Shipping_State_End_Customer__c,Shipping_Country__c,Shipping_Zip_End_Customer__c from case where CaseNumber = : caseNo];
+                   
+             }catch(exception e)
+             {
+             }
+            
+             
+       }
+        //If Salesrep creates an order in shopify with filling Case Number in Notes Section in Shopify
+        if (cs!= NULL) {
+            for (wrapperObjectShopify ord: ordList) {
+                  orderEmail = ord.email;
+                }
+              list<Contact> contactInsertList =  new list<Contact>();
+              list <Contact> contactList = [select id,email from contact where email =: orderEmail];
+                 cs.Shipping_City_EndCustomer__c = orderData.shipping_address.city;
+                         cs.Shipping_Street_End_Customer__c = orderData.shipping_address.address1;
+                         cs.Shipping_State_End_Customer__c =  orderData.shipping_address.province;
+                         cs.Shipping_Country__c = orderData.shipping_address.country;
+                         cs.Shipping_Zip_End_Customer__c = orderData.shipping_address.zip;
+                         cs.Other_Shipping_Phone__c = orderData.shipping_address.phone;
+                         cs.Other_Shipping_Email__c = orderEmail;
+                         
+                         cs.Billing_Street_End_Customer__c = orderData.billing_address.address1;
+                         cs.Billing_City__c = orderData.billing_address.city;
+                         cs.Billing_State__c = orderData.billing_address.province;
+                         cs.Billing_Country__c = orderData.billing_address.country;
+                         cs.Billing_Zipcode__c = orderData.billing_address.zip;
+                         cs.Other_Phone__c = orderData.billing_address.phone;
+                         if((contactList.size()==1) && (cs.ContactID ==null)){
+                         cs.ContactID = contactList[0].id;
+                         }
+                         else if(contactList.size()<1){
+                            list<Account> accountInsertList = new list<Account>();
+                        Account a = new Account();
+                        a.Name = orderData.customer.first_name + ' ' + orderData.customer.last_name;
+                        a.Phone = orderData.shipping_address.phone;
+                        a.BillingState = orderData.billing_address.province;
+                        a.BillingCountry = orderData.billing_address.country;
+                        a.BillingStreet = orderData.billing_address.address1;
+                        a.BillingCity = orderData.billing_address.city;
+                        if(orderData.billing_address.zip!=NULL && orderData.billing_address.zip!='')
+                        {
+                            a.BillingPostalCode = orderData.billing_address.zip;
+                        }
+                        else
+                        {
+                            a.BillingPostalCode = zip;
+                        }
+                        a.ShippingState = orderData.shipping_address.province;
+                        a.ShippingCountry = orderData.shipping_address.country;
+                        if(orderData.shipping_address.zip!=NULL && orderData.shipping_address.zip!='')
+                        {
+                            a.ShippingPostalCode = orderData.shipping_address.zip;
+                        }
+                        else
+                        {
+                            a.ShippingPostalCode = shipzip;
+                        }
+                        a.ShippingStreet = orderData.shipping_address.address1;
+                        a.ShippingCity = orderData.shipping_address.city;
+                        accountInsertList.add(a);
+                        
+                        if(accountInsertList.size()>0)
+                        {
+                            Database.saveresult[] sr = Database.insert(accountInsertList, False);
+                            ErrorLogUtility.processErrorLogs(sr, accountInsertList, 'OrderCreationShopify', 'doPost', 'Account', 'Insert');              
+                        }
+                        
+                        contact con = new contact();
+                        con.FirstName = orderData.customer.first_name;
+                        con.LastName = orderData.customer.last_name;
+                        con.email = orderData.customer.email;
+                        con.MailingStreet = orderData.shipping_address.address1;
+                        con.MailingCity = orderData.shipping_address.city;
+                        con.Mailingstate = orderData.shipping_address.province;
+                        con.MailingCountry = orderData.shipping_address.country;
+                        con.MailingPostalCode = accountInsertList[0].ShippingPostalCode;
+                        con.phone = orderData.shipping_address.phone;
+                        con.accountid = accountInsertList[0].id;
+                        contactInsertList.add(con);
+                        
+                        if(contactInsertList.size()>0)
+                        {
+                            Database.saveresult[] sr = Database.insert(contactInsertList, False);
+                            ErrorLogUtility.processErrorLogs(sr, contactInsertList, 'OrderCreationShopify', 'doPost', 'Contact', 'Insert');
+                            System.debug('contacttttttttttt'+contactInsertList+'srrrrrr'+sr); 
+                        }
+                        if((contactInsertList.size()>0) &&( cs.ContactID==null)){
+                          cs.ContactID = contactInsertList[0].id;
+                        }
+                
+                  }
+                         list <case> dummyUpdateList = new list<case>();
+                           dummyUpdateList.add(cs);
+                     
+                     if(dummyUpdateList.size()>0){    
+                   Database.saveresult[] sr = Database.update(dummyUpdateList, False);
+                      ErrorLogUtility.processErrorLogs(sr, dummyUpdateList, 'OrderCreationShopify', 'doPost', 'case', 'update');
+                     }
+             
+             
+            //The Case number enter in shopify notes section is stored in caseNo
+            System.debug('&&&&&&&&&&' + caseNo);
+           
+
+            //Local Variables
+            list < Service_Quote__c > sqInsert = new list < Service_Quote__c > ();
+            list < Service_Quote_Detail__c > sqDetailInsert = new list < Service_Quote_Detail__c > ();
+            list < Service_Quote_Detail__c > sqDetailDummyList = new list < Service_Quote_Detail__c > ();
+            map < Service_Quote__c, list < Service_Quote_Detail__c >> serviceQuoteAnDetailMap = new map < Service_Quote__c, list < Service_Quote_Detail__c >> ();
+
+            for (wrapperObjectShopify ord: ordList) {
+                Service_Quote__c sq = new Service_Quote__c();
+                
+                if(ord.total_discounts!=0.00){
+                sq.Discount__c = ((ord.total_discounts/ord.total_line_items_price)*100);
+                }
+                sq.Case__c = cs.id;
+                sq.shopify__c = true;
+                sq.recordtypeid = Schema.SObjectType.Service_Quote__c.getRecordTypeInfosByName().get('Shopify Service Quote').getRecordTypeId();
+                sq.Shopify_URL__c = shopifyOrderCreationURL+ ord.id;
+                if (ord.financial_status == orderPending) {
+                    sq.Status__c = orderCreated;
+                    sq.Financial_Status__c = orderPending;
+                } else if (ord.financial_status == financialPaid) {
+                    sq.Status__c = orderPaid;
+                    sq.Financial_Status__c = financialPaid;
+                }
+                sq.Shopify_Order_NO__c = ord.name;
+                sq.Care_Of__c = orderData.billing_address.company;
+                sq.Ship_Too_Company_Name__c = orderData.shipping_address.company;
+                sq.Send_Quote_To_Email__c = orderData.customer.email;
+                sq.Shopify_ID__c = ord.id;
+                sq.Total_Amount__c = ord.total_price;
+                if (contactList.size()==1) {
+                    sq.Send_Quote_To_Contact__c= contactList[0].id;
+                    
+                    
+                }
+                else if((contactList.size()<1) && (contactInsertList.size()>0)){
+                  sq.Send_Quote_To_Contact__c= contactInsertList[0].id;
+                }
+                sqInsert.add(sq);
+
+            }
+            
+            //A Service Quote will be inserted to the relevant case in Salesforce
+            if (sqInsert.size() > 0)
+            {
+                Database.saveresult[] sr = Database.insert(sqInsert, False);
+                ErrorLogUtility.processErrorLogs(sr, sqInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote__c', 'Insert');
+            }
+      /*for (wrapperObjectShopify ord: ordList) {
+                for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                  servicePartName =lt.sku;
+                }
+      }*/
+      //list<service_part__c> sp = [select id,name,Part_Name__c from service_part__c where name=:servicePartName limit 1];
+      system.debug('NanaWallordList@@@'+ordList);
+            for (wrapperObjectShopify ord: ordList) {
+                for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                    Service_Quote_Detail__c sqd = new Service_Quote_Detail__c();
+                    sqd.Discount__c = lt.total_discount;
+                    sqd.Quantity__c = lt.quantity;
+                    sqd.Unit_Price__c = lt.price;
+                    //sqd.Name = lt.Name;
+                    string s = lt.Name;
+                    sqd.Ship_From_Stock__c=true;
+                    sqd.Name = s.left(80);
+                    system.debug('NanaWallservicePartmap@@@'+servicePartmap.containskey(lt.sku));
+                    system.debug('NanaWalllt.sku@@@'+lt.sku);
+                    if(servicePartmap.containskey(lt.sku)){
+                    sqd.Service_Part__c = servicePartmap.get(lt.sku);
+                    }
+            else {
+                            system.debug('HEREPRAVEEN');
+                            sqd.Service_Part__c = servicePartmap.get('0000');
+                        }
+                    sqd.Service_Quote__c = sqInsert[0].id;
+                    sqDetailInsert.add(sqd);
+                }
+            }
+            
+            //A Service Quote details will be inserted to the Service Quotes inserted Above and the product details of shoipfy order is mapped to Service Quote Details 
+            if (sqDetailInsert.size() > 0)
+            {
+                Database.saveresult[] sr = Database.insert(sqDetailInsert, False);
+                ErrorLogUtility.processErrorLogs(sr, sqDetailInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote_Detail__c', 'Insert');
+            }
+        }
+        
+        //If an order is created dirctly on shopify that order needs to be saved in salesforce by mapping to relevant objects
+        else {
+                for (wrapperObjectShopify ord: ordList) {
+                orderEmail = ord.email;
+                }
+
+            list < contact > contactList = [select id, email from contact where email =: orderEmail];
+
+            //if the email address of customer in shopify is having multiple contacts with same email address in salesforce
+            if (contactList.size() > 1) {
+                system.debug('orderData.shipping_addresssss'+orderData.shipping_address);
+                system.debug('orderdattttt'+orderData);
+                //A Case will be inserted without relating case to any contact and a service quote and service quote detail is inserted
+                list<case> caseInsertList = new list<case>();
+                case c = new case ();
+                         c.Origin = caseOrigin;
+                         c.Status = caseStatus;
+                         c.Priority = casePriority; 
+                       //  c.Responsible_Rep__c = caseRep;
+                         c.Shipping_City_EndCustomer__c = orderData.shipping_address.city;
+                         c.Shipping_Street_End_Customer__c = orderData.shipping_address.address1;
+                         c.Shipping_State_End_Customer__c =  orderData.shipping_address.province;
+                         c.Shipping_Country__c = orderData.shipping_address.country;
+                         c.Shipping_Zip_End_Customer__c = orderData.shipping_address.zip;
+                         c.Other_Shipping_Phone__c = orderData.shipping_address.phone;
+                         c.Other_Shipping_Email__c = orderEmail;
+                         
+                         c.Billing_Street_End_Customer__c = orderData.billing_address.address1;
+                         c.Billing_City__c = orderData.billing_address.city;
+                         c.Billing_State__c = orderData.billing_address.province;
+                         c.Billing_Country__c = orderData.billing_address.country;
+                         c.Billing_Zipcode__c = orderData.billing_address.zip;
+                         c.Other_Phone__c = orderData.billing_address.phone;
+                         
+                caseInsertList.add(c);
+                
+                if(caseInsertList.size()>0)
+                {               
+                    Database.saveresult[] sr = Database.insert(caseInsertList, False);
+                    ErrorLogUtility.processErrorLogs(sr, caseInsertList, 'OrderCreationShopify', 'doPost', 'case', 'Insert');
+                }
+
+                for (wrapperObjectShopify ord: ordList) {
+                    Service_Quote__c sq = new Service_Quote__c();
+                    if(ord.total_discounts!=0.00){
+                  sq.Discount__c = ((ord.total_discounts/ord.total_line_items_price)*100);
+                  }
+                    sq.Case__c = caseInsertList[0].id;
+                    sq.shopify__c = true;
+                    sq.recordtypeid = Schema.SObjectType.Service_Quote__c.getRecordTypeInfosByName().get('Shopify Service Quote').getRecordTypeId();
+                    sq.Shopify_URL__c = shopifyOrderCreationURL+ord.id;
+                    if (ord.financial_status == orderPending) {
+                        sq.Status__c = orderCreated;
+                        sq.Financial_Status__c = orderPending;
+                    } else if (ord.financial_status == financialPaid) {
+                        sq.Status__c = orderPaid;
+                        sq.Financial_Status__c = financialPaid;
+                    }
+                    sq.Shopify_Order_NO__c = ord.name;
+                    sq.Shopify_ID__c = ord.id;
+                    sq.Total_Amount__c = ord.total_price;
+                    if (contactList.size()>0) {
+                      sq.Send_Quote_To_Contact__c= contactList[0].id;
+                      
+                  }
+                  sq.Care_Of__c = orderData.billing_address.company;
+                  sq.Ship_Too_Company_Name__c = orderData.shipping_address.company;
+                  sq.Send_Quote_To_Email__c = orderData.customer.email;
+                    serviceQuoteDirectInsert.add(sq);
+                }
+                if (serviceQuoteDirectInsert.size() > 0)
+                {
+                    Database.saveresult[] sr = Database.insert(serviceQuoteDirectInsert, False);
+                    ErrorLogUtility.processErrorLogs(sr, serviceQuoteDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote__c', 'Insert');
+                }
+        /*for (wrapperObjectShopify ord: ordList) {
+                  for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                    servicePartName =lt.sku;
+                  }
+        }*/
+         // list<service_part__c> sp = [select id,name,Part_Name__c from service_part__c where name=:servicePartName limit 1];
+          
+                for (wrapperObjectShopify ord: ordList) {
+                    for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                        Service_Quote_Detail__c sqd = new Service_Quote_Detail__c();
+                        sqd.Discount__c = lt.total_discount;
+                        sqd.Quantity__c = lt.quantity;
+                        sqd.Unit_Price__c = lt.price;
+                        sqd.Ship_From_Stock__c=true;
+                        //sqd.Name = lt.Name;
+                        string s = lt.Name;
+                        sqd.Name = s.left(80);
+                        system.debug('NanaWallservicePartmap@@@'+servicePartmap.containskey(lt.sku));
+                    system.debug('NanaWalllt.sku@@@'+lt.sku);
+                        if(servicePartmap.containskey(lt.sku)){
+                        sqd.Service_Part__c = servicePartmap.get(lt.sku);
+
+                      }
+              else {
+                            system.debug('HEREPRAVEEN');
+                            sqd.Service_Part__c = servicePartmap.get('0000');
+                        }
+                        sqd.Service_Quote__c = serviceQuoteDirectInsert[0].id;
+                        sqDetailsDirectInsert.add(sqd);
+                    }
+                }
+                if (sqDetailsDirectInsert.size() > 0)
+                {
+                    Database.saveresult[] sr = Database.insert(sqDetailsDirectInsert, False);
+                    ErrorLogUtility.processErrorLogs(sr, sqDetailsDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote_Detail__c', 'Insert');
+        
+                }
+                
+                //Class for posting Case Number on Shopify Order (This functionality is commented at present)
+                    //PostingCaseNumberOnShopify.CaseNumberOnShopifyOrder(serviceQuoteDirectInsert[0].id, Notes);
+            }
+            
+            //if there is only one contact in salesforce with shopify order email address
+            else if (contactList.size() == 1) {
+                list < order > orderList = [select id, contact__c from order where contact__c =: contactList[0].id];
+
+                //If there are multiple Order or no Order for the contact
+                if (orderList.size() > 1 || orderList.size() < 1) {
+                    
+                    //A case will be created and it is mapped to a contact and both service quote and service quote details are inserted
+                    list<Case> caseOrderList = new list<Case>();
+                    case c = new case ();
+                    c.Origin = caseOrigin;
+                    c.Status = caseStatus;
+                    c.Priority = casePriority;
+                    c.Contactid = contactList[0].id;
+                    c.Send_Quote_To__c = customer;
+                    c.Ship_To__c = customer;
+                    c.Bill_To__c = customer;
+                  //  c.Responsible_Rep__c = caseRep;
+                         c.Shipping_City_EndCustomer__c = orderData.shipping_address.city;
+                         c.Shipping_Street_End_Customer__c = orderData.shipping_address.address1;
+                         c.Shipping_State_End_Customer__c =  orderData.shipping_address.province;
+                         c.Shipping_Country__c = orderData.shipping_address.country;
+                         c.Shipping_Zip_End_Customer__c = orderData.shipping_address.zip;
+                         c.Other_Shipping_Phone__c = orderData.shipping_address.phone;
+                         c.Other_Shipping_Email__c = orderEmail;
+                         
+                         c.Billing_Street_End_Customer__c = orderData.billing_address.address1;
+                         c.Billing_City__c = orderData.billing_address.city;
+                         c.Billing_State__c = orderData.billing_address.province;
+                         c.Billing_Country__c = orderData.billing_address.country;
+                         c.Billing_Zipcode__c = orderData.billing_address.zip;
+                         c.Other_Phone__c = orderData.billing_address.phone;
+                         
+                    caseOrderList.add(c);
+                    if(caseOrderList.size()>0)
+                    {
+                       Database.saveresult[] sr = Database.insert(caseOrderList, False);
+                       ErrorLogUtility.processErrorLogs(sr, caseOrderList, 'OrderCreationShopify', 'doPost', 'case', 'Insert'); 
+                    }
+                   
+                    for (wrapperObjectShopify ord: ordList) {
+                        Service_Quote__c sq = new Service_Quote__c();
+                        if(ord.total_discounts!=0.00){
+                    sq.Discount__c = ((ord.total_discounts/ord.total_line_items_price)*100);
+                    }
+                        sq.Case__c = caseOrderList[0].id;
+                        sq.shopify__c = true;
+                        sq.recordtypeid = Schema.SObjectType.Service_Quote__c.getRecordTypeInfosByName().get('Shopify Service Quote').getRecordTypeId();
+                        sq.Shopify_URL__c = shopifyOrderCreationURL + ord.id;
+                        if (ord.financial_status == orderPending) {
+                            sq.Status__c = orderCreated;
+                            sq.Financial_Status__c = orderPending;
+                        } else if (ord.financial_status == financialPaid) {
+                            sq.Status__c = orderPaid;
+                            sq.Financial_Status__c = financialPaid;
+                        }
+                        sq.Shopify_Order_NO__c = ord.name;
+                        sq.Shopify_ID__c = ord.id;
+                        sq.Total_Amount__c = ord.total_price;
+                        if (contactList.size()>0) {
+                      sq.Send_Quote_To_Contact__c= contactList[0].id;
+                      
+                    }
+                    sq.Care_Of__c = orderData.billing_address.company;
+                    sq.Ship_Too_Company_Name__c = orderData.shipping_address.company;
+                     sq.Send_Quote_To_Email__c = orderData.customer.email;
+                        serviceQuoteDirectInsert.add(sq);
+                    }
+                    if (serviceQuoteDirectInsert.size() > 0)
+                    {
+                         Database.saveresult[] sr = Database.insert(serviceQuoteDirectInsert, False);
+                         ErrorLogUtility.processErrorLogs(sr, serviceQuoteDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote__c', 'Insert');
+                    }
+
+                    //Class for posting Case Number on Shopify Orders (This functionality is commented at present)
+                    //PostingCaseNumberOnShopify.CaseNumberOnShopifyOrder(serviceQuoteDirectInsert[0].id, Notes);
+          /*for (wrapperObjectShopify ord: ordList) {
+                    for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                      servicePartName =lt.sku;
+                    }
+          }*/
+          //list<service_part__c> sp = [select id,name,Part_Name__c from service_part__c where name=:servicePartName limit 1];
+          
+                    for (wrapperObjectShopify ord: ordList) {
+                        for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                            Service_Quote_Detail__c sqd = new Service_Quote_Detail__c();
+                            sqd.Discount__c = lt.total_discount;
+                            sqd.Quantity__c = lt.quantity;
+                            sqd.Unit_Price__c = lt.price;
+                            sqd.Ship_From_Stock__c=true;
+                            //sqd.Name = lt.Name;
+                            string s = lt.Name;
+                          sqd.Name = s.left(80);
+                          system.debug('NanaWallservicePartmap@@@'+servicePartmap.keySet());
+                          system.debug('NanaWallservicePartmap@@@'+servicePartmap.containskey(lt.sku));
+                    system.debug('NanaWalllt.sku@@@'+lt.sku+'test');
+                            if(servicePartmap.containskey(lt.sku)){
+                            sqd.Service_Part__c = servicePartmap.get(lt.sku);
+                         }
+                         else {
+                            system.debug('HEREPRAVEEN');
+                            sqd.Service_Part__c = servicePartmap.get('0000');
+                        }
+                         
+                            sqd.Service_Quote__c = serviceQuoteDirectInsert[0].id;
+                            sqDetailsDirectInsert.add(sqd);
+                        }
+                    }
+                    if (sqDetailsDirectInsert.size() > 0)
+                    {
+                         Database.saveresult[] sr = Database.insert(sqDetailsDirectInsert, False);
+                         ErrorLogUtility.processErrorLogs(sr, sqDetailsDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote_Detail__c', 'Insert');
+                    }
+                }
+                
+                //if there is only single order for the contact
+                else if (orderList.size() == 1) {
+                
+                //A Case will be inserted by mapping both contact and order to the case and both service quote and service quote detail is inserted
+                    list<Case> caseInsertOrderList = new list<Case>();
+                    case c = new case ();
+                    c.Origin = caseOrigin;
+                    c.Status = caseStatus;
+                    c.Priority = casePriority;
+                    c.Contactid = contactList[0].id;
+                    c.Send_Quote_To__c = customer;
+                    c.Ship_To__c = customer;
+                    c.Bill_To__c = customer;
+                    c.order__c = orderList[0].id;
+              //      c.Responsible_Rep__c = caseRep;
+                         c.Shipping_City_EndCustomer__c = orderData.shipping_address.city;
+                         c.Shipping_Street_End_Customer__c = orderData.shipping_address.address1;
+                         c.Shipping_State_End_Customer__c =  orderData.shipping_address.province;
+                         c.Shipping_Country__c = orderData.shipping_address.country;
+                         c.Shipping_Zip_End_Customer__c = orderData.shipping_address.zip;
+                         c.Other_Shipping_Phone__c = orderData.shipping_address.phone;
+                         c.Other_Shipping_Email__c = orderEmail;
+                         
+                         c.Billing_Street_End_Customer__c = orderData.billing_address.address1;
+                         c.Billing_City__c = orderData.billing_address.city;
+                         c.Billing_State__c = orderData.billing_address.province;
+                         c.Billing_Country__c = orderData.billing_address.country;
+                         c.Billing_Zipcode__c = orderData.billing_address.zip;
+                         c.Other_Phone__c = orderData.billing_address.phone;
+                    caseInsertOrderList.add(c);
+                    
+                    if(caseInsertOrderList.size()>0)
+                    {
+                         Database.saveresult[] sr = Database.insert(caseInsertOrderList, False);
+                         ErrorLogUtility.processErrorLogs(sr, caseInsertOrderList, 'OrderCreationShopify', 'doPost', 'case', 'Insert');              
+                    }
+
+                    for (wrapperObjectShopify ord: ordList) {
+                        Service_Quote__c sq = new Service_Quote__c();
+                        if(ord.total_discounts!=0.00){
+                    sq.Discount__c = ((ord.total_discounts/ord.total_line_items_price)*100);
+                    }
+                        sq.Case__c = caseInsertOrderList[0].id;
+                        sq.shopify__c = true;
+                        sq.recordtypeid = Schema.SObjectType.Service_Quote__c.getRecordTypeInfosByName().get('Shopify Service Quote').getRecordTypeId();
+                        sq.Shopify_URL__c = shopifyOrderCreationURL + ord.id;
+                        if (ord.financial_status == orderPending) {
+                            sq.Status__c = orderCreated;
+                            sq.Financial_Status__c = orderPending;
+                        } else if (ord.financial_status == financialPaid) {
+                            sq.Status__c = orderPaid;
+                            sq.Financial_Status__c = financialPaid;
+                        }
+                        sq.Shopify_Order_NO__c = ord.name;
+                        sq.Shopify_ID__c = ord.id;
+                        sq.Total_Amount__c = ord.total_price;
+                        if (contactList.size()>0) {
+                      sq.Send_Quote_To_Contact__c= contactList[0].id;
+                      
+                    }
+                    sq.Care_Of__c = orderData.billing_address.company;
+                    sq.Ship_Too_Company_Name__c = orderData.shipping_address.company;
+                    sq.Send_Quote_To_Email__c = orderData.customer.email;
+                        serviceQuoteDirectInsert.add(sq);
+                    }
+                    if (serviceQuoteDirectInsert.size() > 0)
+                    {
+                         Database.saveresult[] sr = Database.insert(serviceQuoteDirectInsert, False);
+                         ErrorLogUtility.processErrorLogs(sr, serviceQuoteDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote__c', 'Insert');              
+                    }
+
+                    //Class for posting Case Number on Shopify Orders (This functionality is commented at present)
+                   //PostingCaseNumberOnShopify.CaseNumberOnShopifyOrder(serviceQuoteDirectInsert[0].id, Notes);
+
+                    /*for (wrapperObjectShopify ord: ordList) {
+                    for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                      servicePartName =lt.sku;
+                    }
+          }*/
+          
+      
+                    for (wrapperObjectShopify ord: ordList) {
+                        for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                          
+                            Service_Quote_Detail__c sqd = new Service_Quote_Detail__c();
+                            sqd.Discount__c = lt.total_discount;
+                            sqd.Quantity__c = lt.quantity;
+                            sqd.Unit_Price__c = lt.price;
+                            sqd.Ship_From_Stock__c=true;
+                            //sqd.Name = lt.Name;
+                            string s = lt.Name;
+                          sqd.Name = s.left(80);
+                          system.debug('NanaWallservicePartmap@@@'+servicePartmap.containskey(lt.sku));
+                    system.debug('NanaWalllt.sku@@@'+lt.sku);
+                           if(servicePartmap.containskey(lt.sku)){
+                            sqd.Service_Part__c = servicePartmap.get(lt.sku);
+                         }
+                         else {
+                            sqd.Service_Part__c = servicePartmap.get('0000');
+                        }
+                            sqd.Service_Quote__c = serviceQuoteDirectInsert[0].id;
+                            sqDetailsDirectInsert.add(sqd);
+                        }
+                    }
+                    if (sqDetailsDirectInsert.size() > 0)
+                    {
+                         Database.saveresult[] sr = Database.insert(sqDetailsDirectInsert, False);
+                         ErrorLogUtility.processErrorLogs(sr, sqDetailsDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote_Detail__c', 'Insert');
+                    }
+                }
+            }
+            // if there is no contact present in salesforce with shopify order email address
+            else {
+                
+                //Inserting an Account, Contact, Case and map contact to that case and insert both service quote and service quote details
+                list<Account> accountInsertList = new list<Account>();
+                Account a = new Account();
+                a.Name = orderData.customer.first_name + ' ' + orderData.customer.last_name;
+                a.Phone = orderData.shipping_address.phone;
+                a.BillingState = orderData.billing_address.province;
+                a.BillingCountry = orderData.billing_address.country;
+                a.BillingStreet = orderData.billing_address.address1;
+                a.BillingCity = orderData.billing_address.city;
+                if(orderData.billing_address.zip!=NULL && orderData.billing_address.zip!='')
+                {
+                    a.BillingPostalCode = orderData.billing_address.zip;
+                }
+                else
+                {
+                    a.BillingPostalCode = zip;
+                }
+                a.ShippingState = orderData.shipping_address.province;
+                a.ShippingCountry = orderData.shipping_address.country;
+                if(orderData.shipping_address.zip!=NULL && orderData.shipping_address.zip!='')
+                {
+                    a.ShippingPostalCode = orderData.shipping_address.zip;
+                }
+                else
+                {
+                    a.ShippingPostalCode = shipzip;
+                }
+                a.ShippingStreet = orderData.shipping_address.address1;
+                a.ShippingCity = orderData.shipping_address.city;
+                accountInsertList.add(a);
+                
+                if(accountInsertList.size()>0)
+                {
+                    Database.saveresult[] sr = Database.insert(accountInsertList, False);
+                    ErrorLogUtility.processErrorLogs(sr, accountInsertList, 'OrderCreationShopify', 'doPost', 'Account', 'Insert');              
+                }
+                list<Contact> contactInsertList =  new list<Contact>();
+                contact con = new contact();
+                con.FirstName = orderData.customer.first_name;
+                con.LastName = orderData.customer.last_name;
+                con.email = orderData.customer.email;
+                con.MailingStreet = orderData.shipping_address.address1;
+                con.MailingCity = orderData.shipping_address.city;
+                con.Mailingstate = orderData.shipping_address.province;
+                con.MailingCountry = orderData.shipping_address.country;
+                con.MailingPostalCode = accountInsertList[0].ShippingPostalCode;
+                con.phone = orderData.shipping_address.phone;
+                con.accountid = accountInsertList[0].id;
+                contactInsertList.add(con);
+                if(contactInsertList.size()>0)
+                {
+                    Database.saveresult[] sr = Database.insert(contactInsertList, False);
+                    ErrorLogUtility.processErrorLogs(sr, contactInsertList, 'OrderCreationShopify', 'doPost', 'Contact', 'Insert');
+                    System.debug('contacttttttttttt'+contactInsertList+'srrrrrr'+sr); 
+                }
+
+                list<case> caseListInsert =  new list<case>();
+                case c = new case ();
+                c.Origin = caseOrigin;
+                c.Status = caseStatus;
+                c.Priority = casePriority;
+                if (contactInsertList.size()>0) {
+                    c.Contactid = contactInsertList[0].id;
+                }
+                c.Send_Quote_To__c = customer;
+                c.Ship_To__c = customer;
+                c.Bill_To__c = customer;
+            //    c.Responsible_Rep__c = caseRep;
+                      c.Shipping_City_EndCustomer__c = orderData.shipping_address.city;
+                         c.Shipping_Street_End_Customer__c = orderData.shipping_address.address1;
+                         c.Shipping_State_End_Customer__c =  orderData.shipping_address.province;
+                         c.Shipping_Country__c = orderData.shipping_address.country;
+                         c.Shipping_Zip_End_Customer__c = orderData.shipping_address.zip;
+                         c.Other_Shipping_Phone__c = orderData.shipping_address.phone;
+                         c.Other_Shipping_Email__c = orderEmail;
+                         
+                         c.Billing_Street_End_Customer__c = orderData.billing_address.address1;
+                         c.Billing_City__c = orderData.billing_address.city;
+                         c.Billing_State__c = orderData.billing_address.province;
+                         c.Billing_Country__c = orderData.billing_address.country;
+                         c.Billing_Zipcode__c = orderData.billing_address.zip;
+                         c.Other_Phone__c = orderData.billing_address.phone;
+                caseListInsert.add(c);
+                if(caseListInsert.size()>0)
+                {
+                    Database.saveresult[] sr = Database.insert(caseListInsert, False);
+                    ErrorLogUtility.processErrorLogs(sr, caseListInsert, 'OrderCreationShopify', 'doPost', 'Case', 'Insert');          
+                }
+
+                for (wrapperObjectShopify ord: ordList) {
+                    Service_Quote__c sq = new Service_Quote__c();
+                    if(ord.total_discounts!=0.00){
+                  sq.Discount__c = ((ord.total_discounts/ord.total_line_items_price)*100);
+                  }
+                    sq.Case__c = caseListInsert[0].id;
+                    sq.shopify__c = true;
+                    sq.recordtypeid = Schema.SObjectType.Service_Quote__c.getRecordTypeInfosByName().get('Shopify Service Quote').getRecordTypeId();
+                    sq.Shopify_URL__c = shopifyOrderCreationURL + ord.id;
+                    if (ord.financial_status == orderPending) {
+                        sq.Status__c = orderCreated;
+                        sq.Financial_Status__c = orderPending;
+                    } else if (ord.financial_status == financialPaid) {
+                        sq.Status__c = orderPaid;
+                        sq.Financial_Status__c = financialPaid;
+                    }
+                    sq.Shopify_Order_NO__c = ord.name;
+                    sq.Shopify_ID__c = ord.id;
+                    sq.Total_Amount__c = ord.total_price;
+                    if (contactInsertList.size()>0) {
+                    sq.Send_Quote_To_Contact__c= contactInsertList[0].id;
+                  }
+                  sq.Care_Of__c = orderData.billing_address.company;
+                  sq.Ship_Too_Company_Name__c = orderData.shipping_address.company;
+                  sq.Send_Quote_To_Email__c = orderData.customer.email;
+                    
+                    serviceQuoteDirectInsert.add(sq);
+                }
+
+                if (serviceQuoteDirectInsert.size() > 0)
+                {
+                    Database.saveresult[] sr = Database.insert(serviceQuoteDirectInsert, False);
+                    ErrorLogUtility.processErrorLogs(sr, serviceQuoteDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote__c', 'Insert');
+                }
+
+                //Class for posting Case Number on Shopify Orders (This functionality is commented at present)
+                 //PostingCaseNumberOnShopify.CaseNumberOnShopifyOrder(serviceQuoteDirectInsert[0].id, Notes);
+        
+          
+        
+        
+          
+        /*for (wrapperObjectShopify ord: ordList) {
+                  for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                    servicePartname =lt.sku;
+                  }
+        }*/
+        //list<service_part__c> sp = [select id,name,Part_Name__c from service_part__c where name=:servicePartname limit 1];
+           
+                for (wrapperObjectShopify ord: ordList) {
+                    for (wrapperObjectShopify.line_items lt: ord.line_items) {
+                      
+                        Service_Quote_Detail__c sqd = new Service_Quote_Detail__c();
+                        sqd.Discount__c = lt.total_discount;
+                        sqd.Quantity__c = lt.quantity;
+                        sqd.Unit_Price__c = lt.price;
+                        sqd.Ship_From_Stock__c=true;
+                        string s = lt.Name;
+                        sqd.Name = s.left(80);
+                        system.debug('NanaWallservicePartmap@@@'+servicePartmap.containskey(lt.sku));
+                    system.debug('NanaWalllt.sku@@@'+lt.sku);
+                        if(servicePartmap.containskey(lt.sku)){
+                            sqd.Service_Part__c = servicePartmap.get(lt.sku);
+                         }
+                         else {
+                            sqd.Service_Part__c = servicePartmap.get('0000');
+                        }
+                        sqd.Service_Quote__c = serviceQuoteDirectInsert[0].id;
+                        sqDetailsDirectInsert.add(sqd);
+                    }
+                }
+                if (sqDetailsDirectInsert.size() > 0)
+                {
+                    Database.saveresult[] sr = Database.insert(sqDetailsDirectInsert, False);
+                    ErrorLogUtility.processErrorLogs(sr, sqDetailsDirectInsert, 'OrderCreationShopify', 'doPost', 'Service_Quote_Detail__c', 'Insert');           
+                }
+
+            }
+        }
+    }
+}

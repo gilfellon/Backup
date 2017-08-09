@@ -1,0 +1,8 @@
+<apex:page >
+        
+  <wave:dashboard dashboardId="0FKA0000000CaXKOA0" 
+        showTitle="true" 
+        height="800px" 
+        openLinksInNewWindow="false" 
+        />
+</apex:page>
